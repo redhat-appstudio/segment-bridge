@@ -159,3 +159,35 @@ then 4 times in a row and issue an appropriate alert.
 [ES5]: https://docs.splunk.com/Documentation/SplunkCloud/9.0.2303/SearchReference/Transaction
 [ES6]: https://docs.splunk.com/Documentation/Splunk/9.0.4/SearchReference/Eval
 [ES7]: https://docs.splunk.com/Documentation/Splunk/9.0.4/SearchReference/JSONFunctions#json_object.28.26lt.3Bmembers.26gt.3B.29
+
+## Running a test environment
+
+### Setting up a containerized Splunk instance
+
+To set up a containerized Splunk instance, you can use either podman or docker.
+Follow these steps:
+
+1. Run the container with the desired configuration:
+   ```
+   podman run -p 8000:8000 -p 8089:8089 -e "SPLUNK_PASSWORD=YourPassword" -e "SPLUNK_START_ARGS=--accept-license" -it --name splunk_container docker.io/splunk/splunk:latest
+   ```
+    This command maps port 8000 and port 8089 from the container to the host machine, 
+    set a password that is a minimum of 8 characters long (the minimum requirement),
+    and accepts the Splunk license.
+    For more information about the specific command inputs and options, refer
+    to the [Splunk documentation][CS1].
+2. Once the container is running, you can log in to the Splunk instance using
+   the username `admin` and the password you set up.
+3. To access the Splunk [REST API][CS2],
+   you can make API calls from outside the container using the `curl` command.
+   For example, you can run the following command to search all data:
+     ```
+     curl -u admin:YourPassword -k https://localhost:8089/services/search/jobs -d search="search *"
+     ```
+4. If you want to use the Splunk UI, open a web browser on the host and navigate to
+   `localhost:8000`.
+
+[CS1]:
+https://docs.splunk.com/Documentation/Splunk/9.0.4/Installation/DeployandrunSplunkEnterpriseinsideDockercontainers
+[CS2]:
+https://docs.splunk.com/Documentation/Splunk/9.0.4/RESTTUT/RESTTutorialIntro
