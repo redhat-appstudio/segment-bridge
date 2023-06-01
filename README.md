@@ -114,3 +114,48 @@ The interesting fields for this use case are:
   the SSO user ID to be sent to Segment
 - `status.compliantUsername` - Contains the username used in the cluster audit
   log.
+
+## Details about the Event Sender
+
+Segment has a [built-in mechanism for removing duplicate events][ES1]. This
+mean that we can safely resend the same event multiple times to increase the
+sending process reliability. The duplicate remove mechanism is based on the
+`messageid` [common message field][ES2]. We can use the `auditID` field of the
+cluster audit log record as the value for this field.
+
+Segment also has a [*batch* call][ES3] that allows for sending multiple events
+within a single API call. There is a limit of 500KB data size per-call, while
+individual event JSON records should not exceed 32KB.
+
+The Splunk [streamstats][ES4] command allows for calculating cumulative sums
+and statistics for the records within a Splunk search query, while its
+`reset_after` options allows for restarting the cumulative calculations under
+given conditions. The [transaction][ES5] command allows for the grouping of
+multiple search records into a single record with multi-value fields while the
+`mv_to_json_array` [eval][ES6] function lets one convert such fields into JSON
+lists. Along with the [json_object][ES7] function these could be used to
+convert Splunk query results into a series of JSON objects where each does not
+exceed a given size.
+
+The architecture for the event sending logic would then be to repeat the
+following logic on an hourly basis:
+
+1. Run a Splunk query to retrieve user journey events in the form of a
+   series of JSON objects that match the format of the Segment batch call
+   payload. The query will retrive the events from the audit log records
+   from the last 4 hours.
+2. Attempt to send each JSON object via a Segment batch call up to 3 times.
+  
+Since the logic will run on an hourly basis but will query the events from the
+last 4 hours, it will automatically attempt to send each event up to 4 times
+(Not including retries for failed API calls). Monitoring logic around the
+sending job should allow us to determine if the job failed to complete more
+then 4 times in a row and issue an appropriate alert.
+
+[ES1]: https://segment.com/blog/exactly-once-delivery/
+[ES2]: https://segment.com/docs/connections/spec/common/
+[ES3]: https://segment.com/docs/connections/sources/catalog/libraries/server/http-api/#batch
+[ES4]: https://docs.splunk.com/Documentation/Splunk/9.0.4/SearchReference/Streamstats
+[ES5]: https://docs.splunk.com/Documentation/SplunkCloud/9.0.2303/SearchReference/Transaction
+[ES6]: https://docs.splunk.com/Documentation/Splunk/9.0.4/SearchReference/Eval
+[ES7]: https://docs.splunk.com/Documentation/Splunk/9.0.4/SearchReference/JSONFunctions#json_object.28.26lt.3Bmembers.26gt.3B.29
