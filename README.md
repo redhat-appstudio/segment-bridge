@@ -3,43 +3,47 @@
 Bridge selected events from AppStudio into [Segment][1]
 
 ```mermaid
-flowchart TD
+flowchart TB
     subgraph A["RHTAP clusters"]
         A1[(API server)]
         A2(["OpenShift
-         logging collector"])
+        logging collector"])
 
         A1--"Audit Logs"-->A2
     end
 
-    A2--"Audit Logs"--->C1
+    A2--"Audit Logs"-->C
     
-    subgraph C["Splunk"]
-        C1[("Splunk index")]
-        C2[("Splunk KV store")]
-        C3(["Splunk search"])
-
-        C1 & C2-->C3
-    end
+    C[("Splunk")]
 
     A1--"UserSignup resources"-->B1
 
-    B1--"Username to SSO ID mapping"-->C2
-
     subgraph B["RHTAP Segment bridge"]
-        B1([User mapper])
-        B2([Event sender])
+        B1([get-uid-map.sh])
+        B2([fetch-uj-records.sh])
+        B3([splunk-to-segment.sh])
+        subgraph B4[segment-mass-uploader.sh]
+            B4C([split])
+            B4A([segment-uploader.sh])
+            B4B([mk-segment-batch-payload.sh])
 
-        B1-..->B2
+            B4C--"Segment events (In ~490KB batches)"-->B4A
+            B4A--"events"-->B4B--"batch call payload"-->B4A
+        end
+
+        B1--"Username to UID map"-->B3
+        B2--"Splunk-formatted UJ records"-->B3
+        B3--"Segment events"--> B4
     end
 
-    C3--"User resource
-     actions"-->B2
+    C-- "User resource
+     actions" -->B2
 
     G([Segment])
-    H[(Aplitude)]
+    H[(Amplitude)]
 
-    B2--"User resource actions"-->G-->H
+    B4-- "User resource events
+     (Via batch calls)" -->G-->H
 
     classDef default fill:#f9f9f9,stroke:silver
     class A,B,C notDefault
@@ -74,7 +78,7 @@ server by doing the following on a periodic basis:
 
 [1]: https://app.segment.com
 
-## Details about reading the UserSignup resources
+## Details about reading the UserSignup resources (get-gid-map.sh)
 
 Following is an example of a UserSignup resource:
 ```
@@ -115,7 +119,7 @@ The interesting fields for this use case are:
 - `status.compliantUsername` - Contains the username used in the cluster audit
   log.
 
-## Details about the Event Sender
+## Details about sending events to Segment
 
 Segment has a [built-in mechanism for removing duplicate events][ES1]. This
 mean that we can safely resend the same event multiple times to increase the
@@ -127,24 +131,16 @@ Segment also has a [*batch* call][ES3] that allows for sending multiple events
 within a single API call. There is a limit of 500KB data size per-call, while
 individual event JSON records should not exceed 32KB.
 
-The Splunk [streamstats][ES4] command allows for calculating cumulative sums
-and statistics for the records within a Splunk search query, while its
-`reset_after` options allows for restarting the cumulative calculations under
-given conditions. The [transaction][ES5] command allows for the grouping of
-multiple search records into a single record with multi-value fields while the
-`mv_to_json_array` [eval][ES6] function lets one convert such fields into JSON
-lists. Along with the [json_object][ES7] function these could be used to
-convert Splunk query results into a series of JSON objects where each does not
-exceed a given size.
-
 The architecture for the event sending logic would then be to repeat the
 following logic on an hourly basis:
 
 1. Run a Splunk query to retrieve user journey events in the form of a
-   series of JSON objects that match the format of the Segment batch call
-   payload. The query will retrive the events from the audit log records
-   from the last 4 hours.
-2. Attempt to send each JSON object via a Segment batch call up to 3 times.
+   series of JSON objects that match the format of the Segment batch call event
+   records.
+2. Make adjustments as needed (E.g. username to UID mapping) to generate the
+   actual Segment batch call records.
+3. Split the stream of records into ~500KB chunks
+4. Send each chunk to Segment via a batch call. Attempt this up to 3 times.
   
 Since the logic will run on an hourly basis but will query the events from the
 last 4 hours, it will automatically attempt to send each event up to 4 times
@@ -155,10 +151,6 @@ then 4 times in a row and issue an appropriate alert.
 [ES1]: https://segment.com/blog/exactly-once-delivery/
 [ES2]: https://segment.com/docs/connections/spec/common/
 [ES3]: https://segment.com/docs/connections/sources/catalog/libraries/server/http-api/#batch
-[ES4]: https://docs.splunk.com/Documentation/Splunk/9.0.4/SearchReference/Streamstats
-[ES5]: https://docs.splunk.com/Documentation/SplunkCloud/9.0.2303/SearchReference/Transaction
-[ES6]: https://docs.splunk.com/Documentation/Splunk/9.0.4/SearchReference/Eval
-[ES7]: https://docs.splunk.com/Documentation/Splunk/9.0.4/SearchReference/JSONFunctions#json_object.28.26lt.3Bmembers.26gt.3B.29
 
 ## Running a test environment
 
