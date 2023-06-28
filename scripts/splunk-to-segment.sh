@@ -86,6 +86,7 @@ function event_subject_map() {
 }
 
 jq \
+  --compact-output \
   --slurpfile uidm <(get-uid-map.sh) \
   --slurpfile evvm <(event_verb_map) \
   --slurpfile evsm <(event_subject_map) \
