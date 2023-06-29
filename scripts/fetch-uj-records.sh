@@ -45,6 +45,7 @@ SQ_EV_SELECTOR='search
   NOT verb IN (get, watch, list, deletecollection) 
   "objectRef.apiGroup" IN ("toolchain.dev.openshift.com", "appstudio.redhat.com", "tekton.dev")
   ("impersonatedUser.username"="*" OR (user.username="*" AND NOT user.username="system:*"))
+  (verb!=create OR "responseObject.metadata.resourceVersion"="*")
   '
 SQ_DEDUP_FIELDS="eval dummy=0$(for F in "${FIELDS[@]}"; do echo -n ",$F=mvindex('$F', 0)"; done)"
 SQ_GEN_JSON="eval
