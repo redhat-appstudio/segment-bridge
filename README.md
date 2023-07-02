@@ -183,3 +183,33 @@ Follow these steps:
 https://docs.splunk.com/Documentation/Splunk/9.0.4/Installation/DeployandrunSplunkEnterpriseinsideDockercontainers
 [CS2]:
 https://docs.splunk.com/Documentation/Splunk/9.0.4/RESTTUT/RESTTutorialIntro
+
+### Building and running the segment-bridge container image
+
+The scripts in this repo can be built into a container image to enable
+scheduling and running them on K8s clusters.
+
+To build the image locally, one needs to be logged in to a `redhat.com` account
+(With e.g `podman login`) in order to access the base image and then the image
+can be built with:
+```
+podman build -t segment-bridge .
+```
+
+The scripts require access to Splunk, Segment and OpenShift credentials. One
+way to provide such access is to mount the local `~/.netrc` and
+`~/.kube/config` files (Assuming they contain suitable credentials) to the
+image with a command like the following:
+```
+podman run -it --rm \
+         -v ~/.netrc:/usr/local/etc/netrc:z \
+         -v ~/.kube/config:/usr/local/etc/kube_config:z \
+         segment-bridge
+```
+The following command can be run inside the container to test the full chain of
+scripts. This will copy real data from the staging audit logs in Splunk into the
+Segment DEV environment:
+```
+fetch-uj-records.sh | splunk-to-segment.sh | segment-mass-uploader.sh
+```
+

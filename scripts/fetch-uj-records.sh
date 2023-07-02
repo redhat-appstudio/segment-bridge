@@ -28,6 +28,9 @@ QUERY_EARLIEST_TIME="${QUERY_EARLIEST_TIME:-"-4hours"}"
 # Value is a Splunk time string, defaults to now
 QUERY_LATEST_TIME="${QUERY_LATEST_TIME:-"-0hours"}"
 #
+# A .netrc file to load credentials from
+CURL_NETRC="${CURL_NETRC:-$HOME/.netrc}"
+#
 # === End of parameters ===
 
 SPLUNK_APP_API_URL="$SPLUNK_API_URL/servicesNS/nobody/$SPLUNK_APP_NAME"
@@ -66,7 +69,7 @@ SQ_GEN_JSON="eval
 QUERY="$SQ_EV_SELECTOR | $SQ_DEDUP_FIELDS | $SQ_GEN_JSON"
 
 set -o xtrace
-curl --netrc \
+curl --netrc-file "$CURL_NETRC" \
   "$SPLUNK_APP_SEARCH_URL" \
   --data output_mode=json \
   --data earliest_time="$QUERY_EARLIEST_TIME" \
