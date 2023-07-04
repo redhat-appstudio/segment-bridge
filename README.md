@@ -154,6 +154,35 @@ then 4 times in a row and issue an appropriate alert.
 
 ## Running a test environment
 
+### Kwok Container
+"Kwok" is a Kubernetes SIGs-hosted project. KWOK is an abbreviation for Kubernetes Without Kubelet. Kwok simply simulates the node's behaviour. As a result, it can mimic a high number of nodes and pods while consuming only a small amount of memory.
+
+To run the Kwok container with the Kwok Kubernetes tool, follow these steps:
+
+1. Bring up the Kwok cluster by running the following command:
+
+```
+podman run --rm -d -p 8080:8080 --name kwok-cluster registry.k8s.io/kwok/cluster:v0.3.0-k8s.v1.27.3
+```
+
+2. Once the Kwok cluster is up and running, set the cluster details in the OpenShift client with the following command:
+
+```
+oc config set-cluster kwok --server=http://127.0.0.1:8080
+```
+   Now you can access the cluster using kubectl, e.g.: `kubectl get ns`.
+
+#### Optional
+3. Create a new context (you only need to set the cluster once) for the Kwok cluster with the following command:
+
+```
+oc config set-context kwok --cluster=kwok
+```
+4. Set the Kwok context as the current context, if you've previously switched to another cluster, with the following command:
+```
+oc config use-context kwok
+```
+
 ### Setting up a containerized Splunk instance
 
 To set up a containerized Splunk instance, you can use either podman or docker.
