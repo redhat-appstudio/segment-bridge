@@ -22,11 +22,14 @@ SEGMENT_BATCH_API="${SEGMENT_BATCH_API:-https://api.segment.io/v1/batch}"
 # How many times to rety calling into Segment
 SEGMENT_RETRIES="${SEGMENT_RETRIES:-3}"
 #
+# A .netrc file to load credentials from
+CURL_NETRC="${CURL_NETRC:-$HOME/.netrc}"
+#
 # === End of parameters ===
 
 set -o xtrace
 mk-segment-batch-payload.sh | \
-  curl --netrc \
+  curl --netrc-file "$CURL_NETRC" \
     "$SEGMENT_BATCH_API" \
     --header "Content-Type: application/json" \
     --fail \
