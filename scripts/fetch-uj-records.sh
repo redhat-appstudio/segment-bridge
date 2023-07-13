@@ -27,6 +27,8 @@ QUERY_EARLIEST_TIME="${QUERY_EARLIEST_TIME:-"-4hours"}"
 # Specify the latest time to retrieve records from
 # Value is a Splunk time string, defaults to now
 QUERY_LATEST_TIME="${QUERY_LATEST_TIME:-"-0hours"}"
+# How many times to retry calling Splunk
+SPLUNK_RETRIES="${SPLUNK_RETRIES:-3}"
 #
 # A .netrc file to load credentials from
 CURL_NETRC="${CURL_NETRC:-$HOME/.netrc}"
@@ -52,6 +54,7 @@ QUERY="$($QUERYGEN --index="$SPLUNK_INDEX")"
 set -o xtrace
 curl --netrc-file "$CURL_NETRC" \
   "$SPLUNK_APP_SEARCH_URL" \
+  --retry "$SPLUNK_RETRIES" \
   --data output_mode=json \
   --data earliest_time="$QUERY_EARLIEST_TIME" \
   --data latest_time="$QUERY_LATEST_TIME" \
