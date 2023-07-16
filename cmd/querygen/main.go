@@ -4,12 +4,14 @@ the RHTAP cluster audit logs stored in Splunk.
 
 Usage:
 
-    querygen [flags]
+	querygen [flags]
 
 The flags are:
 
-    --index INDEX
-	    Specify the Splunk index to query.
+	    --index INDEX
+		    Specify the Splunk index to query.
+		-0
+			Print in a format suitable for `xargs -0`
 */
 package main
 
@@ -18,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/redhat-appstudio/segment-bridge.git/querygen"
+	"github.com/redhat-appstudio/segment-bridge.git/queryprint"
 )
 
 var index = flag.String(
@@ -25,8 +28,27 @@ var index = flag.String(
 	"federated:rh_rhtap_stage_audit",
 	"the Splunk index to query",
 )
+var machinePrint = flag.Bool(
+	"0",
+	false,
+	"Output queries in machine-readable compact format, "+
+		"seperated by NULL (\"\x00\") characters",
+)
 
 func main() {
 	flag.Parse()
-	fmt.Println(querygen.GenApplicationQuery(*index))
+	printFunc := queryprint.PrettyPrintQueries
+	if *machinePrint {
+		printFunc = queryprint.MachinePrintQueries
+	}
+	fmt.Println(printFunc([]queryprint.QueryDesc{
+		{
+			Title: "Application events",
+			Query: querygen.GenApplicationQuery(*index),
+		},
+		{
+			Title: "PipelineRun creations for build pipeline",
+			Query: querygen.GenPipelineRunQuery(*index),
+		},
+	}))
 }

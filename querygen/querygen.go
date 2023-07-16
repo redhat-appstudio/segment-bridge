@@ -18,7 +18,7 @@ const (
 	// IncludeFieldsCmd is a Splunk query "fields" command for specifying which
 	// fields to include in the final query results. Since the structure of a
 	// Segment record is quite fixed, most queries should return the same
-	// fields. Some queries may return a subset of these vields but not
+	// fields. Some queries may return a subset of these fields by not
 	// calculating values for all of them.
 	IncludeFieldsCmd = `fields ` +
 		`messageId, timestamp, type, userId, namespace, event_verb, event_subject, properties`
@@ -28,7 +28,7 @@ const (
 	ExcludeFieldsCmd = `fields - _*`
 )
 
-// GenDedupEval generates a Splunk "eval" command for converting multivalue
+// GenDedupEval generates a Splunk "eval" command for converting multi value
 // fields into single-value fields. See RHTAPWATCH-293 for why we need this.
 func GenDedupEval(fields []string) string {
 	var builder strings.Builder

@@ -13,14 +13,14 @@ set -o pipefail -o errexit -o nounset
 # ======= Parameters ======
 # The following variables can be set from outside the script by setting
 # similarly named environment variables.
-# 
+#
 # The API URL to use for connecting to Splunk
 SPLUNK_API_URL="${SPLUNK_API_URL:-https://splunk-api.corp.redhat.com:8089}"
 # The Splunk app name that may store custom data objects we may use for the
 # query
 SPLUNK_APP_NAME="${SPLUNK_APP_NAME:-rh_rhtap}"
 # The Splunk index to fetch data from
-SPLUNK_INDEX="${SPLUNK_INDEX:-federated:rh_rhtap_stage_audit}" 
+SPLUNK_INDEX="${SPLUNK_INDEX:-federated:rh_rhtap_stage_audit}"
 # Specify the earliest time to retrieve records from
 # Value is a Splunk time string, defaults to 4 hours ago
 QUERY_EARLIEST_TIME="${QUERY_EARLIEST_TIME:-"-4hours"}"
@@ -45,17 +45,15 @@ if command -v querygen > /dev/null; then
 elif command -v go > /dev/null; then
   QUERYGEN="go run $GO_PACKAGE/cmd/querygen"
 else
-    echo 'Couldn`t find the querygen binary or go in $PATH' 1>&2
-    exit 127
+  echo 'Couldn`t find the querygen binary or go in $PATH' 1>&2
+  exit 127
 fi
 
-QUERY="$($QUERYGEN --index="$SPLUNK_INDEX")"
-
-set -o xtrace
-curl --netrc-file "$CURL_NETRC" \
-  "$SPLUNK_APP_SEARCH_URL" \
-  --retry "$SPLUNK_RETRIES" \
-  --data output_mode=json \
-  --data earliest_time="$QUERY_EARLIEST_TIME" \
-  --data latest_time="$QUERY_LATEST_TIME" \
-  --data search="$QUERY"
+$QUERYGEN -0 --index="$SPLUNK_INDEX" \
+  | xargs -0 -iQ curl --netrc-file "$CURL_NETRC" \
+    "$SPLUNK_APP_SEARCH_URL" \
+    --retry "$SPLUNK_RETRIES" \
+    --data output_mode=json \
+    --data earliest_time="$QUERY_EARLIEST_TIME" \
+    --data latest_time="$QUERY_LATEST_TIME" \
+    --data search=Q
