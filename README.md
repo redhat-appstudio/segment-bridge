@@ -170,9 +170,7 @@ podman run --rm -d -p 8080:8080 --name kwok-cluster registry.k8s.io/kwok/cluster
 ```
 oc config set-cluster kwok --server=http://127.0.0.1:8080
 ```
-   Now you can access the cluster using kubectl, e.g.: `kubectl get ns`.
 
-#### Optional
 3. Create a new context (you only need to set the cluster once) for the Kwok cluster with the following command:
 
 ```
@@ -182,6 +180,8 @@ oc config set-context kwok --cluster=kwok
 ```
 oc config use-context kwok
 ```
+
+Now you can access the cluster using kubectl, e.g.: `kubectl get ns`.
 
 ### Setting up a containerized Splunk instance
 
