@@ -26,7 +26,7 @@ EXPOSE 8089
 
 USER root
 
-RUN mkdir -p /opt/splunk/var/lib/splunk
+RUN mkdir -p /opt/splunk/var/lib/splunk && pkill -f "splunkd"
 COPY --chmod=777 --from=builder /opt/splunk/etc/apps/search/local/indexes.conf /opt/splunk/etc/apps/search/local/indexes.conf
 COPY --chmod=777 --from=builder /opt/splunk/splunk/ /opt/splunk/var/lib/splunk/
 
