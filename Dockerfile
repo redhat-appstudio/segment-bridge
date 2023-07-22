@@ -1,8 +1,16 @@
+# First stage: Build the Go binaries
+FROM registry.redhat.io/rhel8/go-toolset:1.19.10-3 AS builder
+WORKDIR /app
+COPY . .
+RUN go build -o /app/build/ ./cmd/...
+
+# Second stage: Create the final container image
 FROM registry.redhat.io/openshift4/ose-tools-rhel8:v4.13.0-202306070816.p0.g05d83ef.assembly.stream
 
 COPY --chown=root:root --chmod=644 data/ca-trust/* /etc/pki/ca-trust/source/anchors
 RUN /usr/bin/update-ca-trust
 COPY --chown=root:root --chmod=755 scripts/* /usr/local/bin
+COPY --chown=root:root --chmod=755 --from=builder /app/build/* /usr/local/bin/
 
 # While the scripts already have defaults for the following, specifying them
 # here too for sake of documenting in the Dockerfile which variables affect the
