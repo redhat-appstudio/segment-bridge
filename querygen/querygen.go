@@ -18,16 +18,17 @@ const (
 	// IncludeFieldsCmd is a Splunk query "fields" command for specifying which
 	// fields to include in the final query results. Since the structure of a
 	// Segment record is quite fixed, most queries should return the same
-	// fields.
+	// fields. Some queries may return a subset of these fields by not
+	// calculating values for all of them.
 	IncludeFieldsCmd = `fields ` +
-		`messageId, timestamp, type, userId, event_verb, event_subject, properties`
+		`messageId, timestamp, type, userId, namespace, event_verb, event_subject, properties`
 
 	// ExcludeFieldsCmd is a Splunk query "fields" command for removing fields
 	// from query results that splunk includes by default and we don't need.
 	ExcludeFieldsCmd = `fields - _*`
 )
 
-// GenDedupEval generates a Splunk "eval" command for converting multivalue
+// GenDedupEval generates a Splunk "eval" command for converting multi value
 // fields into single-value fields. See RHTAPWATCH-293 for why we need this.
 func GenDedupEval(fields []string) string {
 	var builder strings.Builder
@@ -60,7 +61,7 @@ func GenPropertiesJSONExpr(properties_map map[string]string) string {
 // we want to include in the query output. Queried objects should have the
 // values needed to generate these fields for this to work.
 type TrackFieldSpec struct {
-	with_userid, with_ev_verb, with_ev_subject bool
+	with_userid, with_ev_verb, with_ev_subject, with_namespace bool
 }
 
 // Generate Splunk query commands for the output fields needed to build a
@@ -75,6 +76,9 @@ func GenTrackFields(spec TrackFieldSpec, properties_map map[string]string) strin
 	builder.WriteString(`type="track",`)
 	if spec.with_userid {
 		builder.WriteString(`userId=` + UserIdExpr + `,`)
+	}
+	if spec.with_namespace {
+		builder.WriteString(`namespace='objectRef.namespace',`)
 	}
 	if spec.with_ev_verb {
 		builder.WriteString(`event_verb=verb,`)
@@ -109,6 +113,11 @@ func GenApplicationQuery(index string) string {
 		"kind":       "objectRef.resource",
 		"name":       "objectRef.name",
 	}
+	track_fields := TrackFieldSpec{
+		with_userid: true,
+		with_ev_verb: true,
+		with_ev_subject: true,
+	}
 	return `search ` +
 		`index="` + index + `" ` +
 		`log_type=audit ` +
@@ -119,5 +128,44 @@ func GenApplicationQuery(index string) string {
 		`("impersonatedUser.username"="*" OR (user.username="*" AND NOT user.username="system:*")) ` +
 		`(verb!=create OR "responseObject.metadata.resourceVersion"="*")` +
 		`|` + GenDedupEval(fields) +
-		`|` + GenTrackFields(TrackFieldSpec{true, true, true}, json_properties)
+		`|` + GenTrackFields(track_fields, json_properties)
+}
+
+// GenApplicationQuery returns a Splunk query for generating Segment events
+// representing creation of AppStudio build PipelineRuns.
+func GenPipelineRunQuery(index string) string {
+	fields := []string{
+		"auditID",
+		"objectRef.resource",
+		"objectRef.namespace",
+		"objectRef.apiGroup",
+		"objectRef.apiVersion",
+		"verb",
+		"requestReceivedTimestamp",
+		"responseObject.metadata.labels.appstudio.openshift.io/application",
+		"responseObject.metadata.labels.appstudio.openshift.io/component",
+	}
+	json_properties := map[string]string{
+		"apiGroup":    "objectRef.apiGroup",
+		"apiVersion":  "objectRef.apiVersion",
+		"kind":        "objectRef.resource",
+		"application": "responseObject.metadata.labels.appstudio.openshift.io/application",
+		"component": "responseObject.metadata.labels.appstudio.openshift.io/component",
+	}
+	track_fields := TrackFieldSpec{
+		with_namespace: true,
+		with_ev_verb: true,
+		with_ev_subject: true,
+	}
+	return `search ` +
+		`index="` + index + `" ` +
+		`log_type=audit ` +
+		`verb=create ` +
+		`"responseStatus.code" IN (200, 201) ` +
+		`"objectRef.apiGroup"="tekton.dev" ` +
+		`"objectRef.resource"="pipelineruns" ` +
+		`"responseObject.metadata.labels.pipelines.appstudio.openshift.io/type"=build` +
+		`"responseObject.metadata.resourceVersion"="*"` +
+		`|` + GenDedupEval(fields) +
+		`|` + GenTrackFields(track_fields, json_properties)
 }
