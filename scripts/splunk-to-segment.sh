@@ -85,17 +85,25 @@ function event_subject_map() {
   }'
 }
 
+# Not all event resources have a userId field necessary for attribution in Segment.
+# In such cases, the owner of the workspace is used instead.
+# For this to work workspaces must be named after a valid SSO username.
 jq \
   --compact-output \
   --slurpfile uidm <(get-uid-map.sh) \
+  --slurpfile wksm <(get-workspace-map.sh) \
   --slurpfile evvm <(event_verb_map) \
   --slurpfile evsm <(event_subject_map) \
-  '.result | select($uidm[0][.userId])
+  '.result
+  | .userIdOrWorkspace = (.userId // $wksm[0][.namespace])
+  | select(.userIdOrWorkspace)
+  | .ssoId = $uidm[0][.userIdOrWorkspace]
+  | select(.ssoId)
   | {
       messageId, 
       timestamp, 
       type, 
-      userId: $uidm[0][.userId], 
+      userId: .ssoId,
       event: "\($evsm[0][.event_subject] // .event_subject) \($evvm[0][.event_verb] // .event_verb)", 
       properties: (.properties|fromjson)
     }
