@@ -4,9 +4,10 @@ package webfixture
 
 import (
 	"net/http"
-	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTraceRequestsFrom(t *testing.T) {
@@ -50,13 +51,7 @@ func TestTraceRequestsFrom(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotRequests := TraceRequestsFrom(tt.test_func)
-			if !reflect.DeepEqual(gotRequests, tt.want) {
-				t.Errorf(
-					"TraceRequestsFrom() = %v, want %v",
-					gotRequests,
-					tt.want,
-				)
-			}
+			assert.Equal(t, tt.want, gotRequests)
 		})
 	}
 }
