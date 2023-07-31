@@ -1,9 +1,11 @@
 #!/bin/bash
 
+total_users=9
 namespace="toolchain-host-operator"
+
 kwokctl --name "$CLUSTER_NAME" kubectl create namespace "$namespace"
 
-for i in $(seq 1 10)
+for i in $(seq 1 $total_users)
 do
 email="user$i@gmail.com"
 email_hash=$(printf "%s" "$email" | md5sum | awk '{ print $1 }')
@@ -26,4 +28,7 @@ spec:
   userid: "f:528d74ff-f703-47ed-9cd5-f0ct$i:user$i"
   username: "user$i"
 EOF
+
+kwokctl --name "$CLUSTER_NAME" kubectl patch usersignup "user$i" -n toolchain-host-operator --type=merge --patch "{\"status\":{\"compliantUsername\":\"user$i\"}}" --subresource=status
+
 done
