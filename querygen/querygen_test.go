@@ -33,7 +33,7 @@ func TestGenDedupEval(t *testing.T) {
 		"responseObject.metadata.labels.appstudio.openshift.io/application" +
 		"=mvindex('responseObject.metadata.labels.appstudio.openshift.io/application', 0)," +
 		"responseObject.metadata.labels.appstudio.openshift.io/component" +
-		"=mvindex('responseObject.metadata.labels.appstudio.openshift.io/component', 0)" 
+		"=mvindex('responseObject.metadata.labels.appstudio.openshift.io/component', 0)"
 	out := GenDedupEval(fields)
 	if out != expected {
 		t.Errorf("GenDedupEval() returns:\n  %q, expected\n  %q", out, expected)
@@ -60,8 +60,8 @@ func TestGenApplicationQuery(t *testing.T) {
 		"name":       "objectRef.name",
 	}
 	track_fields := TrackFieldSpec{
-		with_userid: true,
-		with_ev_verb: true,
+		with_userid:     true,
+		with_ev_verb:    true,
 		with_ev_subject: true,
 	}
 	expected := `search ` +
@@ -198,11 +198,11 @@ func TestGenPipelineRunQuery(t *testing.T) {
 		"apiVersion":  "objectRef.apiVersion",
 		"kind":        "objectRef.resource",
 		"application": "responseObject.metadata.labels.appstudio.openshift.io/application",
-		"component": "responseObject.metadata.labels.appstudio.openshift.io/component",
+		"component":   "responseObject.metadata.labels.appstudio.openshift.io/component",
 	}
 	track_fields := TrackFieldSpec{
-		with_namespace: true,
-		with_ev_verb: true,
+		with_namespace:  true,
+		with_ev_verb:    true,
 		with_ev_subject: true,
 	}
 	expected := `search ` +
