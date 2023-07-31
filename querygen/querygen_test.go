@@ -2,6 +2,8 @@ package querygen
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGenApplicationQuery(t *testing.T) {
@@ -40,9 +42,7 @@ func TestGenApplicationQuery(t *testing.T) {
 		`|` + GenDedupEval(fields) +
 		`|` + GenTrackFields(track_fields, json_properties)
 	out := GenApplicationQuery("some_index")
-	if out != expected {
-		t.Errorf("GenApplicationQuery() = %v, want %v", out, expected)
-	}
+	assert.Equal(t, expected , out)
 }
 
 func TestGenPropertiesJSONExpr(t *testing.T) {
@@ -72,9 +72,8 @@ func TestGenPropertiesJSONExpr(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GenPropertiesJSONExpr(tt.args.properties_map); got != tt.want {
-				t.Errorf("GenPropertiesJSONExpr() = %v, want %v", got, tt.want)
-			}
+			got := GenPropertiesJSONExpr(tt.args.properties_map)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -138,9 +137,8 @@ func TestGenTrackFields(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GenTrackFields(tt.args.spec, tt.args.properties_map); got != tt.want {
-				t.Errorf("GenTrackFields() = %v, want %v", got, tt.want)
-			}
+			got := GenTrackFields(tt.args.spec, tt.args.properties_map)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -180,7 +178,6 @@ func TestGenPipelineRunQuery(t *testing.T) {
 		`"responseObject.metadata.resourceVersion"="*"` +
 		`|` + GenDedupEval(fields) +
 		`|` + GenTrackFields(track_fields, json_properties)
-	if out := GenPipelineRunQuery("some_index"); out != expected {
-		t.Errorf("GenPipelineRunQuery() = %v, want %v", out, expected)
-	}
+	out := GenPipelineRunQuery("some_index")
+	assert.Equal(t, expected, out)
 }
