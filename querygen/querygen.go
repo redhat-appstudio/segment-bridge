@@ -114,14 +114,14 @@ func GenApplicationQuery(index string) string {
 		"name":       "objectRef.name",
 	}
 	track_fields := TrackFieldSpec{
-		with_userid: true,
-		with_ev_verb: true,
+		with_userid:     true,
+		with_ev_verb:    true,
 		with_ev_subject: true,
 	}
 	return `search ` +
 		`index="` + index + `" ` +
 		`log_type=audit ` +
-		`NOT verb IN (get, watch, list, deletecollection) ` +
+		`verb=create ` +
 		`"responseStatus.code" IN (200, 201) ` +
 		`"objectRef.apiGroup"="appstudio.redhat.com" ` +
 		`"objectRef.resource"="applications" ` +
@@ -131,7 +131,7 @@ func GenApplicationQuery(index string) string {
 		`|` + GenTrackFields(track_fields, json_properties)
 }
 
-// GenApplicationQuery returns a Splunk query for generating Segment events
+// GenPipelineRunQuery returns a Splunk query for generating Segment events
 // representing creation of AppStudio build PipelineRuns.
 func GenPipelineRunQuery(index string) string {
 	fields := []string{
@@ -150,11 +150,11 @@ func GenPipelineRunQuery(index string) string {
 		"apiVersion":  "objectRef.apiVersion",
 		"kind":        "objectRef.resource",
 		"application": "responseObject.metadata.labels.appstudio.openshift.io/application",
-		"component": "responseObject.metadata.labels.appstudio.openshift.io/component",
+		"component":   "responseObject.metadata.labels.appstudio.openshift.io/component",
 	}
 	track_fields := TrackFieldSpec{
-		with_namespace: true,
-		with_ev_verb: true,
+		with_namespace:  true,
+		with_ev_verb:    true,
 		with_ev_subject: true,
 	}
 	return `search ` +
