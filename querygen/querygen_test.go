@@ -67,7 +67,7 @@ func TestGenApplicationQuery(t *testing.T) {
 	expected := `search ` +
 		`index="some_index" ` +
 		`log_type=audit ` +
-		`NOT verb IN (get, watch, list, deletecollection) ` +
+		`verb=create ` +
 		`"responseStatus.code" IN (200, 201) ` +
 		`"objectRef.apiGroup"="appstudio.redhat.com" ` +
 		`"objectRef.resource"="applications" ` +

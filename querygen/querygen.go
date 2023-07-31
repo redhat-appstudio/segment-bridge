@@ -121,7 +121,7 @@ func GenApplicationQuery(index string) string {
 	return `search ` +
 		`index="` + index + `" ` +
 		`log_type=audit ` +
-		`NOT verb IN (get, watch, list, deletecollection) ` +
+		`verb=create ` +
 		`"responseStatus.code" IN (200, 201) ` +
 		`"objectRef.apiGroup"="appstudio.redhat.com" ` +
 		`"objectRef.resource"="applications" ` +
