@@ -40,7 +40,7 @@ func TestFieldSet_QueryGen(t *testing.T) {
 			want: `search index="foo"` +
 				`|` + GenDedupEval([]string{"plain_field"}) +
 				`|` + includeFieldsCmd +
-				`|` + ExcludeFieldsCmd,
+				`|` + excludeFieldsCmd,
 		},
 		{
 			name: "Non-existent field",
@@ -59,7 +59,7 @@ func TestFieldSet_QueryGen(t *testing.T) {
 			want: `search index="foo"` +
 				`|` + GenDedupEval([]string{"plain_field", "plain_field2"}) +
 				`|` + includeFieldsCmd +
-				`|` + ExcludeFieldsCmd,
+				`|` + excludeFieldsCmd,
 		},
 		{
 			name: "With renamed field",
@@ -71,7 +71,7 @@ func TestFieldSet_QueryGen(t *testing.T) {
 				`|` + GenDedupEval([]string{"plain_field", "orig.field"}) +
 				`|eval renamed_fld='orig.field'` +
 				`|` + includeFieldsCmd +
-				`|` + ExcludeFieldsCmd,
+				`|` + excludeFieldsCmd,
 		},
 		{
 			name: "With fallback fields",
@@ -85,7 +85,7 @@ func TestFieldSet_QueryGen(t *testing.T) {
 				`fallback=if(isnull('orig_a1'),'orig_a2','orig_a1'),` +
 				`fallback2=if(isnull('orig_b1'),if(isnull('orig_b2'),'orig_b3','orig_b2'),'orig_b1')` +
 				`|` + includeFieldsCmd +
-				`|` + ExcludeFieldsCmd,
+				`|` + excludeFieldsCmd,
 		},
 		{
 			name: "With expression fields",
@@ -97,7 +97,7 @@ func TestFieldSet_QueryGen(t *testing.T) {
 				`|` + GenDedupEval([]string{"e1", "e2"}) +
 				`|eval fixed_expr="foo",fixed_expr2='e1'+'e2'` +
 				`|` + includeFieldsCmd +
-				`|` + ExcludeFieldsCmd,
+				`|` + excludeFieldsCmd,
 		},
 		{
 			name: "With sub objects",
@@ -111,7 +111,7 @@ func TestFieldSet_QueryGen(t *testing.T) {
 				`sub_obj=json_object("so_fld1",'so_fld1',"so_fld3",'so_fld3_orig'),` +
 				`sub_obj2=json_object("so_fld2",'so_fld2')` +
 				`|` + includeFieldsCmd +
-				`|` + ExcludeFieldsCmd,
+				`|` + excludeFieldsCmd,
 		},
 	}
 	for _, tt := range tests {

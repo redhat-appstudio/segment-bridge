@@ -6,6 +6,12 @@ import (
 	"strings"
 )
 
+const (
+	// ExcludeFieldsCmd is a Splunk query "fields" command for removing fields
+	// from query results that splunk includes by default and we don't need.
+	excludeFieldsCmd = `fields - _*`
+)
+
 // FieldSet defines a set of fields that can be included in the query output,
 // how to generated the values for them from the input index and how to place
 // then in the output
@@ -51,7 +57,7 @@ func (fs FieldSet) QueryGen(searchExpr string, fields []string) (string, error) 
 	queryElements = append(
 		queryElements,
 		"fields "+commaSep(fs.collectIncludeFields()),
-		ExcludeFieldsCmd,
+		excludeFieldsCmd,
 	)
 	return strings.Join(queryElements, "|"), nil
 }

@@ -24,7 +24,7 @@ func TestUserJourneyQueryGen(t *testing.T) {
 		`|fields ` +
 		`event_subject,event_verb,messageId,namespace,` +
 		`properties,timestamp,type,userId` +
-		`|` + ExcludeFieldsCmd
+		`|` + excludeFieldsCmd
 	type args struct {
 		index     string
 		predicate string
