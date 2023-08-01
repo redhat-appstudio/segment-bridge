@@ -8,16 +8,15 @@ import (
 
 func TestGenApplicationQuery(t *testing.T) {
 	fields := []string{
-		"auditID",
-		"impersonatedUser.username",
-		"user.username",
-		"objectRef.resource",
-		"objectRef.namespace",
 		"objectRef.apiGroup",
 		"objectRef.apiVersion",
-		"objectRef.name",
+		"objectRef.resource",
 		"verb",
+		"auditID",
+		"objectRef.name",
 		"requestReceivedTimestamp",
+		"impersonatedUser.username",
+		"user.username",
 	}
 	json_properties := map[string]string{
 		"apiGroup":   "objectRef.apiGroup",
@@ -105,12 +104,12 @@ func TestGenTrackFields(t *testing.T) {
 				properties_map: json_properties,
 			},
 			want: `eval ` +
-				`messageId=auditID,` +
-				`timestamp=requestReceivedTimestamp,` +
+				`event_subject='objectRef.resource',` +
+				`event_verb='verb',` +
+				`messageId='auditID',` +
+				`timestamp='requestReceivedTimestamp',` +
 				`type="track",` +
 				`userId=` + UserIdExpr + `,` +
-				`event_verb=verb,` +
-				`event_subject='objectRef.resource',` +
 				`properties=` + GenPropertiesJSONExpr(json_properties) +
 				`|` + IncludeFieldsCmd + `|` + ExcludeFieldsCmd,
 		},
@@ -125,12 +124,12 @@ func TestGenTrackFields(t *testing.T) {
 				properties_map: json_properties,
 			},
 			want: `eval ` +
-				`messageId=auditID,` +
-				`timestamp=requestReceivedTimestamp,` +
-				`type="track",` +
-				`namespace='objectRef.namespace',` +
-				`event_verb=verb,` +
 				`event_subject='objectRef.resource',` +
+				`event_verb='verb',` +
+				`messageId='auditID',` +
+				`namespace='objectRef.namespace',` +
+				`timestamp='requestReceivedTimestamp',` +
+				`type="track",` +
 				`properties=` + GenPropertiesJSONExpr(json_properties) +
 				`|` + IncludeFieldsCmd + `|` + ExcludeFieldsCmd,
 		},
@@ -145,15 +144,15 @@ func TestGenTrackFields(t *testing.T) {
 
 func TestGenPipelineRunQuery(t *testing.T) {
 	fields := []string{
-		"auditID",
-		"objectRef.resource",
-		"objectRef.namespace",
 		"objectRef.apiGroup",
 		"objectRef.apiVersion",
-		"verb",
-		"requestReceivedTimestamp",
 		"responseObject.metadata.labels.appstudio.openshift.io/application",
 		"responseObject.metadata.labels.appstudio.openshift.io/component",
+		"objectRef.resource",
+		"verb",
+		"auditID",
+		"objectRef.namespace",
+		"requestReceivedTimestamp",
 	}
 	json_properties := map[string]string{
 		"apiGroup":    "objectRef.apiGroup",
