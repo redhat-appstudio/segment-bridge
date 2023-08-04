@@ -56,4 +56,4 @@ $QUERYGEN -0 --index="$SPLUNK_INDEX" \
     --data output_mode=json \
     --data earliest_time="$QUERY_EARLIEST_TIME" \
     --data latest_time="$QUERY_LATEST_TIME" \
-    --data search=Q
+    --data-urlencode search=Q
