@@ -22,7 +22,7 @@ func TestUserJourneyQueryGen(t *testing.T) {
 		`"kind",'objectRef.resource'` +
 		`)` +
 		`|fields ` +
-		`event_subject,event_verb,messageId,namespace,` +
+		`event,event_subject,event_verb,messageId,namespace,` +
 		`properties,timestamp,type,userId` +
 		`|` + excludeFieldsCmd
 	type args struct {

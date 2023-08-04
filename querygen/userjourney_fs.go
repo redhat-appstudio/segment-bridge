@@ -11,6 +11,7 @@ var UserJourneyFieldSet = FieldSet{
 	"type":          {srcExpr: `"track"`},
 	"userId":        {srcFields: []string{"impersonatedUser.username", "user.username"}},
 	"namespace":     {srcFields: []string{"objectRef.namespace"}},
+	"event":         {srcFields: []string{"event"}},
 	"event_verb":    {srcFields: []string{"verb"}},
 	"event_subject": {srcFields: []string{"objectRef.resource"}},
 	"apiGroup":      {subObj: "properties", srcFields: []string{"objectRef.apiGroup"}},
