@@ -7,12 +7,12 @@ package querygen
 func GenApplicationQuery(index string) string {
 	q, _ := UserJourneyQueryGen(
 		index,
-		`verb=create ` +
-		`"responseStatus.code" IN (200, 201) ` +
-		`"objectRef.apiGroup"="appstudio.redhat.com" ` +
-		`"objectRef.resource"="applications" ` +
-		`("impersonatedUser.username"="*" OR (user.username="*" AND NOT user.username="system:*")) ` +
-		`(verb!=create OR "responseObject.metadata.resourceVersion"="*")`,
+		`verb=create `+
+			`"responseStatus.code" IN (200, 201) `+
+			`"objectRef.apiGroup"="appstudio.redhat.com" `+
+			`"objectRef.resource"="applications" `+
+			`("impersonatedUser.username"="*" OR (user.username="*" AND NOT user.username="system:*")) `+
+			`(verb!=create OR "responseObject.metadata.resourceVersion"="*")`,
 		[]string{"name", "userId"},
 	)
 	return q
@@ -23,13 +23,13 @@ func GenApplicationQuery(index string) string {
 func GenPipelineRunQuery(index string) string {
 	q, _ := UserJourneyQueryGen(
 		index,
-		`verb=create ` +
-		`"responseStatus.code" IN (200, 201) ` +
-		`"objectRef.apiGroup"="tekton.dev" ` +
-		`"objectRef.resource"="pipelineruns" ` +
-		`"responseObject.metadata.labels.pipelines.appstudio.openshift.io/type"=build` +
-		`"responseObject.metadata.resourceVersion"="*"`,
-		[]string{"namespace","application","component"},
+		`verb=create `+
+			`"responseStatus.code" IN (200, 201) `+
+			`"objectRef.apiGroup"="tekton.dev" `+
+			`"objectRef.resource"="pipelineruns" `+
+			`"responseObject.metadata.labels.pipelines.appstudio.openshift.io/type"=build`+
+			`"responseObject.metadata.resourceVersion"="*"`,
+		[]string{"namespace", "application", "component"},
 	)
 	return q
 }

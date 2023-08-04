@@ -12,7 +12,7 @@ import (
 
 func TestGenApplicationQuery(t *testing.T) {
 	out := GenApplicationQuery("some_index")
-	assert.NotEqual(t, "" , out)
+	assert.NotEqual(t, "", out)
 }
 
 func TestGenPipelineRunQuery(t *testing.T) {

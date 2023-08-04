@@ -37,8 +37,8 @@ func TestUserJourneyQueryGen(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "With invalid fields",
-			args: args{fields: []string{"no_such"}},
+			name:    "With invalid fields",
+			args:    args{fields: []string{"no_such"}},
 			wantErr: true,
 		},
 		{
@@ -62,9 +62,9 @@ func TestUserJourneyQueryGen(t *testing.T) {
 		{
 			name: "With an extra field and predicate",
 			args: args{
-				index: "idx2",
+				index:     "idx2",
 				predicate: "verb=create",
-				fields: []string{"userId"},
+				fields:    []string{"userId"},
 			},
 			want: fmt.Sprintf(
 				queryTemplate,
@@ -80,8 +80,8 @@ func TestUserJourneyQueryGen(t *testing.T) {
 					"impersonatedUser.username",
 					"user.username",
 				}),
-				`userId=if(isnull('impersonatedUser.username'),` +
-				`'user.username','impersonatedUser.username'),`,
+				`userId=if(isnull('impersonatedUser.username'),`+
+					`'user.username','impersonatedUser.username'),`,
 			),
 		},
 	}
