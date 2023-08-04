@@ -47,8 +47,12 @@ func main() {
 			Query: querygen.GenApplicationQuery(*index),
 		},
 		{
-			Title: "PipelineRun creations for build pipeline",
-			Query: querygen.GenPipelineRunQuery(*index),
+			Title: "Build PipelineRun creation events",
+			Query: querygen.GenBuildPipelineRunCreatedQuery(*index),
+		},
+		{
+			Title: "Build PipelineRun started events",
+			Query: querygen.GenBuildPipelineRunStartedQuery(*index),
 		},
 	}))
 }

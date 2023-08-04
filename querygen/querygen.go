@@ -18,17 +18,41 @@ func GenApplicationQuery(index string) string {
 	return q
 }
 
-// GenPipelineRunQuery returns a Splunk query for generating Segment events
+// GenBuildPipelineRunCreatedQuery returns a Splunk query for generating Segment events
 // representing creation of AppStudio build PipelineRuns.
-func GenPipelineRunQuery(index string) string {
+func GenBuildPipelineRunCreatedQuery(index string) string {
 	q, _ := UserJourneyQueryGen(
 		index,
 		`verb=create `+
 			`"responseStatus.code" IN (200, 201) `+
 			`"objectRef.apiGroup"="tekton.dev" `+
 			`"objectRef.resource"="pipelineruns" `+
-			`"responseObject.metadata.labels.pipelines.appstudio.openshift.io/type"=build`+
-			`"responseObject.metadata.resourceVersion"="*"`,
+			`"responseObject.metadata.labels.pipelines.appstudio.openshift.io/type"=build `+
+			`"responseObject.metadata.resourceVersion"="*" `+
+			`| eval event="Build PipelineRun created" `,
+		[]string{"namespace", "application", "component"},
+	)
+	return q
+}
+
+// GenBuildPipelineRunStartedQuery returns a Splunk query for generating Segment events
+// representing the start of AppStudio build PipelineRuns.
+func GenBuildPipelineRunStartedQuery(index string) string {
+	q, _ := UserJourneyQueryGen(
+		index,
+		`verb=update `+
+			`"responseStatus.code"=200 `+
+			`"objectRef.apiGroup"="tekton.dev" `+
+			`"objectRef.resource"="pipelineruns" `+
+			`"objectRef.subresource"="status" `+
+			`"responseObject.metadata.labels.pipelines.appstudio.openshift.io/type"=build `+
+			`"responseObject.metadata.resourceVersion"="*" `+
+			`"responseObject.status.startTime"="*" `+
+			`| eval event="Build PipelineRun started" `+
+			`| spath path=responseObject.status.conditions{} output=conditions `+
+			`| mvexpand conditions `+
+			`| spath input=conditions `+
+			`| where type="Succeeded" AND reason="Running" AND like(message, "Tasks Completed: 0 %") `,
 		[]string{"namespace", "application", "component"},
 	)
 	return q
