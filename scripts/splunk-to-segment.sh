@@ -100,11 +100,12 @@ jq \
   | .ssoId = $uidm[0][.userIdOrWorkspace]
   | select(.ssoId)
   | {
-      messageId, 
-      timestamp, 
-      type, 
+      messageId,
+      timestamp,
+      type,
       userId: .ssoId,
       event: (.event // "\($evsm[0][.event_subject] // .event_subject) \($evvm[0][.event_verb] // .event_verb)"),
-      properties: (.properties|fromjson)
+      properties: (.properties|fromjson),
+      context: (.context|fromjson)
     }
   '

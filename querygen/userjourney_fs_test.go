@@ -20,9 +20,10 @@ func TestUserJourneyQueryGen(t *testing.T) {
 		`"apiGroup",'objectRef.apiGroup',` +
 		`"apiVersion",'objectRef.apiVersion',` +
 		`"kind",'objectRef.resource'` +
-		`)` +
+		`),` +
+		`context=json_object("userAgent",'userAgent')` +
 		`|fields ` +
-		`event,event_subject,event_verb,messageId,namespace,` +
+		`context,event,event_subject,event_verb,messageId,namespace,` +
 		`properties,timestamp,type,userId` +
 		`|` + excludeFieldsCmd
 	type args struct {
@@ -55,6 +56,7 @@ func TestUserJourneyQueryGen(t *testing.T) {
 					"verb",
 					"auditID",
 					"requestReceivedTimestamp",
+					"userAgent",
 				}),
 				"",
 			),
@@ -77,6 +79,7 @@ func TestUserJourneyQueryGen(t *testing.T) {
 					"verb",
 					"auditID",
 					"requestReceivedTimestamp",
+					"userAgent",
 					"impersonatedUser.username",
 					"user.username",
 				}),

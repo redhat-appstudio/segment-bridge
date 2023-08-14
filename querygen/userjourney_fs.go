@@ -9,6 +9,7 @@ var UserJourneyFieldSet = FieldSet{
 	"messageId":     {srcFields: []string{"auditID"}},
 	"timestamp":     {srcFields: []string{"requestReceivedTimestamp"}},
 	"type":          {srcExpr: `"track"`},
+	"userAgent":     {subObj: "context"},
 	"userId":        {srcFields: []string{"impersonatedUser.username", "user.username"}},
 	"namespace":     {srcFields: []string{"objectRef.namespace"}},
 	"event":         {srcFields: []string{"event"}},
@@ -37,6 +38,7 @@ var UserJourneyCommonFields = [...]string{
 	"messageId",
 	"timestamp",
 	"type",
+	"userAgent",
 }
 
 func UserJourneyQueryGen(index, predicate string, fields []string) (string, error) {
