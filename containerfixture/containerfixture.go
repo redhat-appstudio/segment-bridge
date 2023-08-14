@@ -5,13 +5,24 @@ import (
 	"fmt"
 	"math/rand"
 	"os/exec"
+	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"text/template"
 	"time"
 )
 
-type DeploymentInfo struct {
+const (
+	serviceUpTimeout       = 120
+	containerBuildAttempts = 3
+	minDynamicPort         = 49152
+	maxDynamicPort         = 65535
+)
+
+var r = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+type FixtureInfo struct {
 	Yaml    string
 	PodName string
 	WebPort string
@@ -19,30 +30,25 @@ type DeploymentInfo struct {
 }
 
 // Generates a random dynamic port number
-func getRandomPort() string {
-	minPort := 49152
-	maxPort := 65535
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-
-	randomPort := fmt.Sprintf("%d", r.Intn(maxPort-minPort)+minPort)
+func getRandomDynamicPort() string {
+	randomPort := fmt.Sprintf("%d", r.Intn(maxDynamicPort-minDynamicPort)+minDynamicPort)
 	return randomPort
 }
 
 // Modify the yaml manifest to allow running it in parallel
-// as many times as needed with dynamic values
-func modifyTemplate(yaml string) DeploymentInfo {
-
-	podName := fmt.Sprintf("test-pod-%s", getRandomPort())
-	webPort := getRandomPort()
-	apiPort := getRandomPort()
-	deployment := DeploymentInfo{
-		Yaml:    yaml,
+// as many times as needed with dynamic values for its name and ports
+func generateFixturePodYaml(templateYaml string) FixtureInfo {
+	podName := fmt.Sprintf("test-pod-%s", getRandomDynamicPort())
+	webPort := getRandomDynamicPort()
+	apiPort := getRandomDynamicPort()
+	deployment := FixtureInfo{
+		Yaml:    templateYaml,
 		PodName: podName,
 		WebPort: webPort,
 		ApiPort: apiPort,
 	}
 
-	template, _ := template.New("manifest").Parse(yaml)
+	template, _ := template.New("manifest").Parse(templateYaml)
 	var buf bytes.Buffer
 	template.ExecuteTemplate(&buf, "manifest", deployment)
 	templatedYAML := buf.String()
@@ -54,62 +60,81 @@ func modifyTemplate(yaml string) DeploymentInfo {
 // Building and Running a k8s manifest using 'podman kube play' command.
 // It will make up to three attempts to run with different configurations,
 // allowing it to run concurrently if necessary
-func BuildAndRunPod(t *testing.T, manifest string) DeploymentInfo {
-	var deployment map[string]string
-	attempts := 3
-	for attempt := 0; attempt < attempts; attempt++ {
-		deployment := modifyTemplate(manifest)
+func buildAndRunPod(t *testing.T, manifestTemplate string) FixtureInfo {
+	var deployment FixtureInfo
+	for attempt := 0; attempt < containerBuildAttempts; attempt++ {
+		deployment = generateFixturePodYaml(manifestTemplate)
 		cmd := exec.Command("podman", "play", "kube", "-")
 		cmd.Stdin = strings.NewReader(deployment.Yaml)
-		var stdoutBuf, stderrBuf bytes.Buffer
-		cmd.Stdout = &stdoutBuf
-		cmd.Stderr = &stderrBuf
 
-		err := cmd.Run()
+		stdout, err := cmd.Output()
 		if err == nil {
-			t.Logf("STDOUT: %s", stdoutBuf.String())
+			t.Logf("STDOUT: %s", string(stdout))
 			return deployment
 		}
-		t.Logf("Failed to start pod (attempt %d of %d).\n", attempt+1, attempts)
-		t.Logf("STDERR: %s", stderrBuf.String())
+		t.Logf("Failed to start pod (attempt %d of %d).\n", attempt+1, containerBuildAttempts)
+		t.Logf("STDERR: %s", err.Error())
 	}
-	Cleanup(t, deployment["podName"])
+	cleanup(t, deployment.PodName)
 	t.Fail()
-	t.Logf("Failed to start pod after %d attempts", attempts)
-	return DeploymentInfo{"", "", "", ""} // Avoid 'missing return' error
+	t.Logf("Failed to start pod after %d attempts", containerBuildAttempts)
+	return FixtureInfo{} // Avoid 'missing return' error
 }
 
-// VerifyServiceIsUp continuously monitors the service container to
+// RequireServiceIsUp continuously monitors the service container to
 // ensure it is up and ready for use in tests. It achieves this by repeatedly
 // checking the status endpoint of the service API over a period of two minutes.
-func VerifyServiceIsUp(t *testing.T, endpoint string, serviceName string) {
+func RequireServiceIsUp(t *testing.T, endpoint string, msgAndArgs ...interface{}) {
+	netrcPath, _ := GetNetrcPath()
 	timeoutStart := time.Now().Unix()
 	for {
 		cmd := exec.Command("curl", "-s", "-o", "/dev/null", "-w", "%{http_code}",
-			"--netrc-file", "../containerfixture/.netrc", "--insecure", endpoint)
-		output, _ := cmd.CombinedOutput()
+			"--netrc-file", netrcPath, "--insecure", endpoint)
+		output, err := cmd.Output()
+		if err != nil && string(output) != "000" {
+			t.Log(string(output))
+			t.Fatalf("curl command failed: %s", err)
+		}
 		if string(output) == "200" {
-			t.Logf("%s service deployed successfully!", serviceName)
 			break
 		}
-		if time.Now().Unix()-timeoutStart > 120 {
-			t.Fatalf("The %s instance is not up, cannot verify indexing for tests.", serviceName)
+		if time.Now().Unix()-timeoutStart > serviceUpTimeout {
+			t.Fatalf("%s", msgAndArgs)
 		}
 		time.Sleep(5 * time.Second)
 	}
 }
 
+// GetNetrcPath allows us to get the full path to the containerfixture
+// .netrc file from every script in the project
+func GetNetrcPath() (string, error) {
+	_, filename, _, ok := runtime.Caller(0)
+	if !ok {
+		return "", fmt.Errorf("failed to find the path of the current script")
+	}
+	dirPath := filepath.Dir(filename)
+	netrcPath := filepath.Join(dirPath, ".netrc")
+
+	return netrcPath, nil
+}
+
 // Making sure to stop and remove the pod we deployed
-func Cleanup(t *testing.T, podName string) {
-	t.Log("Stopping and removing the pod...")
+func cleanup(t *testing.T, podName string) {
 	cmd := exec.Command("podman", "pod", "stop", podName)
 	if err := cmd.Run(); err != nil {
-		t.Log("Error stopping the pod:", err)
+		t.Errorf("Error stopping the pod: %s", err)
 	}
 	removePodCmd := exec.Command("podman", "pod", "rm", "-f", podName)
 	if err := removePodCmd.Run(); err != nil {
-		t.Log("Error removing the pod:", err)
-	} else {
-		t.Logf("Pod %s removed successfully.", podName)
+		t.Fatalf("Error removing the pod: %s", err)
 	}
+}
+
+func WithServiceContainer(t *testing.T, ServiceManifest string, testFunc func(FixtureInfo)) {
+	deployment := buildAndRunPod(t, ServiceManifest)
+
+	defer cleanup(t, deployment.PodName)
+
+	testFunc(deployment)
+	return
 }
