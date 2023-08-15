@@ -32,6 +32,6 @@ mk-segment-batch-payload.sh | \
   curl --netrc-file "$CURL_NETRC" \
     "$SEGMENT_BATCH_API" \
     --header "Content-Type: application/json" \
-    --fail \
+    --fail --fail-early \
     --retry "$SEGMENT_RETRIES" \
     --data @- \
