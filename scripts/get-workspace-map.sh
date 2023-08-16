@@ -35,7 +35,7 @@ read -r -a CONTEXTS <<< "${CONTEXTS:-""}"
 
 if [[ ${#CONTEXTS[@]} -eq 0 ]]; then
   mapfile -t CONTEXTS < <(
-    kubectl config view -o=json \
+    oc config view -o=json \
     | jq --argjson clusters "$stage_clusters" \
     '.contexts | .[] | select(.context.cluster as $c | $clusters | index($c)) | .name'
   )
