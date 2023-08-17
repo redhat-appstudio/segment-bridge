@@ -104,7 +104,8 @@ jq \
   --slurpfile wksm "$WS_MAP_FILE" \
   --slurpfile evvm <(event_verb_map) \
   --slurpfile evsm <(event_subject_map) \
-  '.result
+  'select(.result)
+  | .result
   | .userIdOrWorkspace = (.userId // $wksm[0][.namespace])
   | select(.userIdOrWorkspace)
   | .ssoId = $uidm[0][.userIdOrWorkspace]
