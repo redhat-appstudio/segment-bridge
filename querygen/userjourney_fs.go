@@ -27,6 +27,22 @@ var UserJourneyFieldSet = FieldSet{
 		subObj:    "properties",
 		srcFields: []string{"responseObject.metadata.labels.appstudio.openshift.io/component"},
 	},
+	"vulnerabilities_critical": {
+		subObj:    "properties",
+		srcFields: []string{"clair_scan_result.vulnerabilities.critical"},
+	},
+	"vulnerabilities_high": {
+		subObj:    "properties",
+		srcFields: []string{"clair_scan_result.vulnerabilities.high"},
+	},
+	"vulnerabilities_medium": {
+		subObj:    "properties",
+		srcFields: []string{"clair_scan_result.vulnerabilities.medium"},
+	},
+	"vulnerabilities_low": {
+		subObj:    "properties",
+		srcFields: []string{"clair_scan_result.vulnerabilities.low"},
+	},
 }
 
 var UserJourneyCommonFields = [...]string{
