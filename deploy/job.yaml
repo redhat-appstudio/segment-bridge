@@ -1,0 +1,55 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: segment-bridge
+spec:
+  schedule: "@hourly"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 10
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: segment-bridge
+            image: image-registry.openshift-image-registry.svc:5000/rhtap-o11y--runtime-int/segment-bridge-job
+            imagePullPolicy: Always
+            command:
+              - "main-job.sh"
+            tty: true
+            volumeMounts:
+            - mountPath: /usr/local/etc/netrc
+              name: netrc
+              readOnly: true
+            - mountPath: /usr/local/etc/kube-config
+              name: kube-config
+              readOnly: true
+            - mountPath: /usr/local/etc/uid-map
+              name: uid-map
+              readOnly: true
+            - mountPath: /usr/local/etc/ws-map
+              name: ws-map
+              readOnly: true
+            env:
+            - name: CURL_NETRC
+              value: "/usr/local/etc/netrc/netrc"
+            - name: KUBECONFIG
+              value: "/usr/local/etc/kube-config/kube-config"
+            - name: UID_MAP_FILE
+              value: "/usr/local/etc/uid-map/uid-map.json"
+            - name: WS_MAP_FILE
+              value: "/usr/local/etc/ws-map/ws-map.json"
+          volumes:
+          - name: netrc
+            secret:
+              secretName: netrc
+          - name: kube-config
+            secret:
+              secretName: kube-config
+          - name: uid-map
+            configMap:
+              name: uid-map
+          - name: ws-map
+            configMap:
+              name: ws-map

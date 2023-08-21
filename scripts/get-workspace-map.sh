@@ -54,4 +54,4 @@ printf "%s\n" "${CONTEXTS[@]}" | xargs -r --replace=C \
           {{- $comma = true -}}
           "{{$namespace}}":"{{ $workspace }}"
       {{- end -}}}\n' \
-  | jq --slurp 'add'
+  | jq --slurp 'add' --compact-output

@@ -50,7 +50,8 @@ else
 fi
 
 $QUERYGEN -0 --index="$SPLUNK_INDEX" \
-  | xargs -0 -iQ curl --netrc-file "$CURL_NETRC" \
+  | xargs -0 --no-run-if-empty -iQ curl --netrc-file "$CURL_NETRC" \
+    --fail --fail-early \
     "$SPLUNK_APP_SEARCH_URL" \
     --retry "$SPLUNK_RETRIES" \
     --data output_mode=json \
