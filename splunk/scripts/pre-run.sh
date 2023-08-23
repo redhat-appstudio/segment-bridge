@@ -23,3 +23,6 @@ bash /opt/splunk/log_indexing.sh
 
 # Copy the whole Splunk DB to an accessible directory
 sudo cp -r /opt/splunk/var/lib/splunk/ /opt/splunk/splunk
+
+# Shut down the Splunk service
+sudo -u splunk /opt/splunk/bin/splunk stop
