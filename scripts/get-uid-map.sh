@@ -15,8 +15,10 @@ oc get \
     {{- $comma := false}}
     {{- range .items}}
       {{- if $uid := (index .metadata.annotations "toolchain.dev.openshift.com/sso-user-id")}}
-        {{- if $comma}},{{end}}
-        {{- $comma = true -}}
-        "{{.status.compliantUsername}}":{{$uid}}
+        {{- if $uname := (.status.compliantUsername)}}
+          {{- if $comma}},{{end}}
+          {{- $comma = true -}}
+          "{{$uname}}":{{$uid}}
+        {{- end}}
       {{- end}}
     {{- end}}}\n' 
