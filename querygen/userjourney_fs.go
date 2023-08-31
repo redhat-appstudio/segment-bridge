@@ -37,12 +37,12 @@ var UserJourneyFieldSet = FieldSet{
 		srcExpr:   `replace('responseObject.metadata.annotations.build.appstudio.openshift.io/repo',"^([^?]*)(.*)?","\1")`,
 	},
 	"status_message": {
-		subObj:    "properties",
-		srcFields: []string{"responseObject.status.conditions{}.message"},
+		subObj:  "properties",
+		srcExpr: `mvindex('responseObject.status.conditions{}.message', 0)`,
 	},
 	"status_reason": {
-		subObj:    "properties",
-		srcFields: []string{"responseObject.status.conditions{}.reason"},
+		subObj:  "properties",
+		srcExpr: `mvindex('responseObject.status.conditions{}.reason', 0)`,
 	},
 	"target_branch": {
 		subObj:    "properties",

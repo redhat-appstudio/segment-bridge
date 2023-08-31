@@ -106,7 +106,7 @@ func GenBuildPipelineRunCompletedQuery(index string) string {
 			`"responseObject.status.completionTime"="*" `+
 			`| spath responseObject.status.conditions{}`+
 			`| mvexpand responseObject.status.conditions{}`+
-			`| search responseObject.status.conditions{}.type="Succeeded" AND ` +
+			`| search responseObject.status.conditions{}.type="Succeeded" AND `+
 			`(responseObject.status.conditions{}.reason="Completed" OR `+
 			`responseObject.status.conditions{}.reason="Failed")`+
 			`| eval event="Build PipelineRun ".mvindex('responseObject.status.conditions{}.reason', 0)`,
@@ -115,6 +115,28 @@ func GenBuildPipelineRunCompletedQuery(index string) string {
 			"status_message", "status_reason",
 			"repo", "commit_sha", "target_branch",
 		},
+	)
+	return q
+}
+
+// GenReleaseCompletedQuery returns a Splunk query for generating Segment events
+// representing the Release resource success/failure state changes.
+func GenReleaseCompletedQuery(index string) string {
+	q, _ := UserJourneyQueryGen(
+		index,
+		`verb=patch `+
+			`"responseStatus.code"=200 `+
+			`"objectRef.apiGroup"="appstudio.redhat.com" `+
+			`"objectRef.resource"="releases" `+
+			`"objectRef.subresource"="status" `+
+			`"responseObject.metadata.resourceVersion"="*" `+
+			`"responseObject.status.completionTime"="*" `+
+			`| spath path=responseObject.status.conditions{} output=conditions `+
+			`| mvexpand conditions `+
+			`| spath input=conditions `+
+			`| search type="Released" AND (reason="Succeeded" OR reason="Failed") `+
+			`| eval event="Release ".mvindex('responseObject.status.conditions{}.reason', 0)`,
+		[]string{"namespace", "name", "status_message", "status_reason"},
 	)
 	return q
 }
