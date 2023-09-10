@@ -28,7 +28,7 @@ USER root
 
 RUN mkdir -p /opt/splunk/var/lib/splunk
 COPY --chmod=777 --from=builder /opt/splunk/etc/apps/search/local/indexes.conf /opt/splunk/etc/apps/search/local/indexes.conf
-COPY --chmod=777 --from=builder /opt/splunk/splunk/ /opt/splunk/var/lib/splunk/
+COPY --chmod=777 --from=builder /var/splunk_buildtime_db/splunk /opt/splunk/var/lib/splunk/
 
 ENV SPLUNKD_SSL_ENABLE=false
 
