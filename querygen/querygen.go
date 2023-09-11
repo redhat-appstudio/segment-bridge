@@ -87,3 +87,27 @@ func GenClairScanCompletedQuery(index string) string {
 	)
 	return q
 }
+
+// GenBuildPipelineRunCompletedQuery returns a Splunk query for generating Segment events
+// representing success or failure of AppStudio build PipelineRuns.
+func GenBuildPipelineRunCompletedQuery(index string) string {
+	q, _ := UserJourneyQueryGen(
+		index,
+		`verb=update `+
+			`"responseStatus.code"=200 `+
+			`"objectRef.apiGroup"="tekton.dev" `+
+			`"objectRef.resource"="pipelineruns" `+
+			`"objectRef.subresource"="status" `+
+			`"responseObject.metadata.labels.pipelines.appstudio.openshift.io/type"=build `+
+			`"responseObject.metadata.resourceVersion"="*" `+
+			`"responseObject.status.completionTime"="*" `+
+			`| spath responseObject.status.conditions{}`+
+			`| mvexpand responseObject.status.conditions{}`+
+			`| search responseObject.status.conditions{}.type="Succeeded" AND ` +
+			`(responseObject.status.conditions{}.reason="Completed" OR `+
+			`responseObject.status.conditions{}.reason="Failed")`+
+			`| eval event="Build PipelineRun ".mvindex('responseObject.status.conditions{}.reason', 0)`,
+		[]string{"namespace", "application", "component", "status_message", "status_reason"},
+	)
+	return q
+}

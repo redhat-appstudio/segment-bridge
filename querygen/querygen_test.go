@@ -29,3 +29,8 @@ func TestGenClairScanCompletedQuery(t *testing.T) {
 	out := GenClairScanCompletedQuery("some_index")
 	assert.NotEqual(t, "", out)
 }
+
+func TestGenBuildPipelineRunCompletedQuery(t *testing.T) {
+	out := GenBuildPipelineRunCompletedQuery("some_index")
+	assert.NotEqual(t, "", out)
+}

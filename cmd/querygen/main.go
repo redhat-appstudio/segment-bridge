@@ -58,5 +58,9 @@ func main() {
 			Title: "Clair scan TaskRun completion events",
 			Query: querygen.GenClairScanCompletedQuery(*index),
 		},
+		{
+			Title: "Build PipelineRun Completed or Failed event",
+			Query: querygen.GenBuildPipelineRunCompletedQuery(*index),
+		},
 	}))
 }

@@ -43,6 +43,14 @@ var UserJourneyFieldSet = FieldSet{
 		subObj:    "properties",
 		srcFields: []string{"clair_scan_result.vulnerabilities.low"},
 	},
+	"status_message": {
+		subObj:    "properties",
+		srcFields: []string{"responseObject.status.conditions{}.message"},
+	},
+	"status_reason": {
+		subObj:    "properties",
+		srcFields: []string{"responseObject.status.conditions{}.reason"},
+	},
 }
 
 var UserJourneyCommonFields = [...]string{
