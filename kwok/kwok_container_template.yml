@@ -9,7 +9,7 @@ metadata:
 spec:
   containers:
   - name: kwok
-    image: quay.io/srivickynesh/kwok:kwok-bundle
+    image: kwok
     ports:
     - containerPort: 8080
       hostPort: 8080
