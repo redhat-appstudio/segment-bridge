@@ -1,5 +1,8 @@
 # segment-bridge
 
+DUMMY CHANGE TO TEST RHTAP BUILDS.
+
+
 Bridge selected events from AppStudio into [Segment][1]
 
 ```mermaid
@@ -13,7 +16,7 @@ flowchart TB
     end
 
     A2--"Audit Logs"-->C
-    
+
     C[("Splunk")]
 
     A1--"UserSignup resources"-->B1
@@ -141,7 +144,7 @@ following logic on an hourly basis:
    actual Segment batch call records.
 3. Split the stream of records into ~500KB chunks
 4. Send each chunk to Segment via a batch call. Attempt this up to 3 times.
-  
+
 Since the logic will run on an hourly basis but will query the events from the
 last 4 hours, it will automatically attempt to send each event up to 4 times
 (Not including retries for failed API calls). Monitoring logic around the
