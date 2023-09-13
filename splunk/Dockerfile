@@ -21,7 +21,7 @@ FROM docker.io/splunk/splunk@sha256:0bcd9c9f836cfb72b80b5ff8deec692b561473e68b9e
 
 ENV SPLUNK_START_ARGS=--accept-license
 
-EXPOSE 8080
+EXPOSE 8000
 EXPOSE 8089
 
 USER root
