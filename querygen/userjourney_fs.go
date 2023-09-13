@@ -23,9 +23,30 @@ var UserJourneyFieldSet = FieldSet{
 		subObj:    "properties",
 		srcFields: []string{"responseObject.metadata.labels.appstudio.openshift.io/application"},
 	},
+	"commit_sha": {
+		subObj:    "properties",
+		srcFields: []string{"responseObject.metadata.annotations.build.appstudio.redhat.com/commit_sha"},
+	},
 	"component": {
 		subObj:    "properties",
 		srcFields: []string{"responseObject.metadata.labels.appstudio.openshift.io/component"},
+	},
+	"repo": {
+		subObj:    "properties",
+		srcFields: []string{"responseObject.metadata.annotations.build.appstudio.openshift.io/repo"},
+		srcExpr:   `replace('responseObject.metadata.annotations.build.appstudio.openshift.io/repo',"^([^?]*)(.*)?","\1")`,
+	},
+	"status_message": {
+		subObj:    "properties",
+		srcFields: []string{"responseObject.status.conditions{}.message"},
+	},
+	"status_reason": {
+		subObj:    "properties",
+		srcFields: []string{"responseObject.status.conditions{}.reason"},
+	},
+	"target_branch": {
+		subObj:    "properties",
+		srcFields: []string{"responseObject.metadata.annotations.build.appstudio.redhat.com/target_branch"},
 	},
 	"vulnerabilities_critical": {
 		subObj:    "properties",
@@ -42,14 +63,6 @@ var UserJourneyFieldSet = FieldSet{
 	"vulnerabilities_low": {
 		subObj:    "properties",
 		srcFields: []string{"clair_scan_result.vulnerabilities.low"},
-	},
-	"status_message": {
-		subObj:    "properties",
-		srcFields: []string{"responseObject.status.conditions{}.message"},
-	},
-	"status_reason": {
-		subObj:    "properties",
-		srcFields: []string{"responseObject.status.conditions{}.reason"},
 	},
 }
 

@@ -30,7 +30,10 @@ func GenBuildPipelineRunCreatedQuery(index string) string {
 			`"responseObject.metadata.labels.pipelines.appstudio.openshift.io/type"=build `+
 			`"responseObject.metadata.resourceVersion"="*" `+
 			`| eval event="Build PipelineRun created" `,
-		[]string{"namespace", "application", "component"},
+		[]string{
+			"namespace", "application", "component",
+			"repo", "commit_sha", "target_branch",
+		},
 	)
 	return q
 }
@@ -107,7 +110,11 @@ func GenBuildPipelineRunCompletedQuery(index string) string {
 			`(responseObject.status.conditions{}.reason="Completed" OR `+
 			`responseObject.status.conditions{}.reason="Failed")`+
 			`| eval event="Build PipelineRun ".mvindex('responseObject.status.conditions{}.reason', 0)`,
-		[]string{"namespace", "application", "component", "status_message", "status_reason"},
+		[]string{
+			"namespace", "application", "component",
+			"status_message", "status_reason",
+			"repo", "commit_sha", "target_branch",
+		},
 	)
 	return q
 }
