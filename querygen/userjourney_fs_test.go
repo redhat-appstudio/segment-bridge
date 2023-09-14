@@ -8,7 +8,7 @@ import (
 )
 
 func TestUserJourneyQueryGen(t *testing.T) {
-	queryTemplate := `search index="%s" log_type=audit %s|%s|` +
+	queryTemplate := `search index="%s" log_type=audit %s|` +
 		`eval ` +
 		`event_subject='objectRef.resource',` +
 		`event_verb='verb',` +
@@ -49,15 +49,6 @@ func TestUserJourneyQueryGen(t *testing.T) {
 				queryTemplate,
 				"idx1",
 				"",
-				GenDedupEval([]string{
-					"objectRef.apiGroup",
-					"objectRef.apiVersion",
-					"objectRef.resource",
-					"verb",
-					"auditID",
-					"requestReceivedTimestamp",
-					"userAgent",
-				}),
 				"",
 			),
 		},
@@ -72,17 +63,6 @@ func TestUserJourneyQueryGen(t *testing.T) {
 				queryTemplate,
 				"idx2",
 				"verb=create",
-				GenDedupEval([]string{
-					"objectRef.apiGroup",
-					"objectRef.apiVersion",
-					"objectRef.resource",
-					"verb",
-					"auditID",
-					"requestReceivedTimestamp",
-					"userAgent",
-					"impersonatedUser.username",
-					"user.username",
-				}),
 				`userId=if(isnull('impersonatedUser.username'),`+
 					`'user.username','impersonatedUser.username'),`,
 			),
