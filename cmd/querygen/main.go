@@ -62,5 +62,9 @@ func main() {
 			Title: "Build PipelineRun Completed or Failed event",
 			Query: querygen.GenBuildPipelineRunCompletedQuery(*index),
 		},
+		{
+			Title: "Release Succeeded or Failed events",
+			Query: querygen.GenReleaseCompletedQuery(*index),
+		},
 	}))
 }
