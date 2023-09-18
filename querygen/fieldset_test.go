@@ -38,7 +38,6 @@ func TestFieldSet_QueryGen(t *testing.T) {
 				fields:     []string{"plain_field"},
 			},
 			want: `search index="foo"` +
-				`|` + GenDedupEval([]string{"plain_field"}) +
 				`|` + includeFieldsCmd +
 				`|` + excludeFieldsCmd,
 		},
@@ -57,7 +56,6 @@ func TestFieldSet_QueryGen(t *testing.T) {
 				fields:     []string{"plain_field", "plain_field2"},
 			},
 			want: `search index="foo"` +
-				`|` + GenDedupEval([]string{"plain_field", "plain_field2"}) +
 				`|` + includeFieldsCmd +
 				`|` + excludeFieldsCmd,
 		},
@@ -68,7 +66,6 @@ func TestFieldSet_QueryGen(t *testing.T) {
 				fields:     []string{"plain_field", "renamed_fld"},
 			},
 			want: `search index="foo"` +
-				`|` + GenDedupEval([]string{"plain_field", "orig.field"}) +
 				`|eval renamed_fld='orig.field'` +
 				`|` + includeFieldsCmd +
 				`|` + excludeFieldsCmd,
@@ -80,7 +77,6 @@ func TestFieldSet_QueryGen(t *testing.T) {
 				fields:     []string{"fallback", "fallback2"},
 			},
 			want: `search index="foo"` +
-				`|` + GenDedupEval([]string{"orig_a1", "orig_a2", "orig_b1", "orig_b2", "orig_b3"}) +
 				`|eval ` +
 				`fallback=if(isnull('orig_a1'),'orig_a2','orig_a1'),` +
 				`fallback2=if(isnull('orig_b1'),if(isnull('orig_b2'),'orig_b3','orig_b2'),'orig_b1')` +
@@ -94,7 +90,6 @@ func TestFieldSet_QueryGen(t *testing.T) {
 				fields:     []string{"fixed_expr", "fixed_expr2"},
 			},
 			want: `search index="foo"` +
-				`|` + GenDedupEval([]string{"e1", "e2"}) +
 				`|eval fixed_expr="foo",fixed_expr2='e1'+'e2'` +
 				`|` + includeFieldsCmd +
 				`|` + excludeFieldsCmd,
@@ -106,7 +101,6 @@ func TestFieldSet_QueryGen(t *testing.T) {
 				fields:     []string{"plain_field", "so_fld1", "plain_field2", "so_fld2", "so_fld3"},
 			},
 			want: `search index="foo"` +
-				`|` + GenDedupEval([]string{"plain_field", "so_fld1", "plain_field2", "so_fld2", "so_fld3_orig"}) +
 				`|eval ` +
 				`sub_obj=json_object("so_fld1",'so_fld1',"so_fld3",'so_fld3_orig'),` +
 				`sub_obj2=json_object("so_fld2",'so_fld2')` +
