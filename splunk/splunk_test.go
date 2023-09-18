@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/redhat-appstudio/segment-bridge.git/containerfixture"
-
+	"github.com/redhat-appstudio/segment-bridge.git/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -21,11 +21,12 @@ var countPattern = regexp.MustCompile(`(?m)^count\s+(\d+)$`)
 const NotUpErrorMsg = "The %s instance is not up, cannot verify indexing for tests."
 
 func withSplunkContainer(t *testing.T, testFunc func(containerfixture.FixtureInfo)) {
+	filepath, _ := utils.GetCallerFileDirPath(1)
 	containerfixture.WithServiceContainer(
-		t, splunkServiceManifest,
+		t, "splunk", filepath, splunkServiceManifest,
 		func(fi containerfixture.FixtureInfo) {
 			endpoint := fmt.Sprintf("http://localhost:%s/%s", fi.ApiPort, ServiceStatusCheckPath)
-			containerfixture.RequireServiceIsUp(t, endpoint, ServiceName, NotUpErrorMsg)
+			containerfixture.RequireServiceIsUp(t, endpoint, NotUpErrorMsg, ServiceName)
 			testFunc(fi)
 		})
 }

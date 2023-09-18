@@ -57,9 +57,23 @@ func generateFixturePodYaml(templateYaml string) FixtureInfo {
 	return deployment
 }
 
+// Building a container image using the 'podman build' command.
+func buildContainer(t *testing.T, serviceName, service_image_dir string) {
+	cmd := exec.Command("podman", "build", "-t", serviceName, service_image_dir)
+	stdout, err := cmd.Output()
+	if err == nil {
+		t.Logf("STDOUT: %s", string(stdout))
+		return
+	}
+	t.Errorf("Failed to build image")
+	t.Errorf("STDERR: %s", err.Error())
+	t.Fail()
+}
+
 // Building and Running a k8s manifest using 'podman kube play' command.
+// if the image is already built, it'll run the pod using it.
 // It will make up to three attempts to run with different configurations,
-// allowing it to run concurrently if necessary
+// allowing it to run concurrently if necessary.
 func buildAndRunPod(t *testing.T, manifestTemplate string) FixtureInfo {
 	var deployment FixtureInfo
 	for attempt := 0; attempt < containerBuildAttempts; attempt++ {
@@ -130,7 +144,8 @@ func cleanup(t *testing.T, podName string) {
 	}
 }
 
-func WithServiceContainer(t *testing.T, ServiceManifest string, testFunc func(FixtureInfo)) {
+func WithServiceContainer(t *testing.T, serviceName, serviceDirPath, ServiceManifest string, testFunc func(FixtureInfo)) {
+	buildContainer(t, serviceName, serviceDirPath)
 	deployment := buildAndRunPod(t, ServiceManifest)
 
 	defer cleanup(t, deployment.PodName)

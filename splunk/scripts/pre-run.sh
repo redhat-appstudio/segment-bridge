@@ -21,9 +21,12 @@ done
 # Index the logs required for the tests
 bash /opt/splunk/log_indexing.sh
 
+# Wait an extra 10 seconds to assure completion of logs ingestion (fix flakiness)
+sleep 10
+
 # Copy the whole Splunk DB to an accessible directory
-sudo mkdir -p /var/splunk_buildtime_db/splunk
-sudo cp -r /opt/splunk/var/lib/splunk/ /var/splunk_buildtime_db/splunk
+sudo mkdir -p /var/splunk_buildtime_db
+sudo cp -r /opt/splunk/var/lib/splunk/ /var/splunk_buildtime_db
 
 # Shut down the Splunk service
 sudo -u splunk /opt/splunk/bin/splunk stop

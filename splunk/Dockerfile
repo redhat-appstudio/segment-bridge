@@ -9,7 +9,7 @@ COPY --chmod=777 tests/indexes.conf /opt/splunk/etc/apps/search/local/indexes.co
 COPY --chmod=777 scripts/log_indexing.sh /opt/splunk/log_indexing.sh
 COPY --chmod=777 scripts/pre-run.sh /opt/splunk/pre-run.sh
 
-RUN microdnf install -y jq \
+RUN microdnf install -y jq --disablerepo="*" --enablerepo="ubi-8-appstream-rpms" \
     && microdnf clean all \
     && umask 000 \
     && touch "/opt/splunk/output.log"
@@ -28,7 +28,7 @@ USER root
 
 RUN mkdir -p /opt/splunk/var/lib/splunk
 COPY --chmod=777 --from=builder /opt/splunk/etc/apps/search/local/indexes.conf /opt/splunk/etc/apps/search/local/indexes.conf
-COPY --chmod=777 --from=builder /var/splunk_buildtime_db/splunk /opt/splunk/var/lib/splunk/
+COPY --chmod=777 --from=builder /var/splunk_buildtime_db/splunk/ /opt/splunk/var/lib/splunk/
 
 ENV SPLUNKD_SSL_ENABLE=false
 
