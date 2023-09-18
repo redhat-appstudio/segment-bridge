@@ -11,6 +11,10 @@ import (
 	"testing"
 	"text/template"
 	"time"
+
+	"gopkg.in/yaml.v3"
+
+	"github.com/redhat-appstudio/segment-bridge.git/scripts"
 )
 
 const (
@@ -57,9 +61,24 @@ func generateFixturePodYaml(templateYaml string) FixtureInfo {
 	return deployment
 }
 
+// Building a container image using the 'podman build' command.
+func buildContainer(t *testing.T, serviceName, service_image_dir string) {
+	cmd := exec.Command("podman", "build", "-t", serviceName, "-f", serviceName+"/Dockerfile")
+	cmd.Dir = service_image_dir
+	stdout, err := cmd.Output()
+	if err == nil {
+		t.Logf("STDOUT: %s", string(stdout))
+		return
+	}
+	t.Errorf("Failed to build image")
+	t.Errorf("STDERR: %s", err.Error())
+	t.Fail()
+}
+
 // Building and Running a k8s manifest using 'podman kube play' command.
+// if the image is already built, it'll run the pod using it.
 // It will make up to three attempts to run with different configurations,
-// allowing it to run concurrently if necessary
+// allowing it to run concurrently if necessary.
 func buildAndRunPod(t *testing.T, manifestTemplate string) FixtureInfo {
 	var deployment FixtureInfo
 	for attempt := 0; attempt < containerBuildAttempts; attempt++ {
@@ -131,10 +150,41 @@ func cleanup(t *testing.T, podName string) {
 }
 
 func WithServiceContainer(t *testing.T, ServiceManifest string, testFunc func(FixtureInfo)) {
+	rootDir, err := scripts.GetRepoRootDir()
+	if err != nil {
+		t.Errorf("Could not determine path for building the container")
+		t.Fail()
+	}
+
+	images := getManifestImages(t, ServiceManifest)
+	for _, image := range images {
+		buildContainer(t, image, rootDir)
+	}
 	deployment := buildAndRunPod(t, ServiceManifest)
 
 	defer cleanup(t, deployment.PodName)
-
-	testFunc(deployment)
 	return
+}
+
+type PodDefinition struct {
+	Spec struct {
+		Containers []struct {
+			Image string
+		}
+	}
+}
+
+// Parsing a yaml manifest in order to list the images used in each pod's containers
+func getManifestImages(t *testing.T, ServiceManifest string) []string {
+	var pod PodDefinition
+	if err := yaml.Unmarshal([]byte(ServiceManifest), &pod); err != nil {
+		t.Errorf("Error parsing manifest: %v", err)
+		t.Fail()
+	}
+
+	var images []string
+	for _, container := range pod.Spec.Containers {
+		images = append(images, container.Image)
+	}
+	return images
 }

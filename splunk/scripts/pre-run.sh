@@ -22,8 +22,8 @@ done
 bash /opt/splunk/log_indexing.sh
 
 # Copy the whole Splunk DB to an accessible directory
-sudo mkdir -p /var/splunk_buildtime_db/splunk
-sudo cp -r /opt/splunk/var/lib/splunk/ /var/splunk_buildtime_db/splunk
+sudo mkdir -p /var/splunk_buildtime_db
+sudo cp -r /opt/splunk/var/lib/splunk/ /var/splunk_buildtime_db
 
 # Shut down the Splunk service
 sudo -u splunk /opt/splunk/bin/splunk stop

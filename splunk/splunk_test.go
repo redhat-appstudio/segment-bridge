@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/redhat-appstudio/segment-bridge.git/containerfixture"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -25,7 +24,7 @@ func withSplunkContainer(t *testing.T, testFunc func(containerfixture.FixtureInf
 		t, splunkServiceManifest,
 		func(fi containerfixture.FixtureInfo) {
 			endpoint := fmt.Sprintf("http://localhost:%s/%s", fi.ApiPort, ServiceStatusCheckPath)
-			containerfixture.RequireServiceIsUp(t, endpoint, ServiceName, NotUpErrorMsg)
+			containerfixture.RequireServiceIsUp(t, endpoint, NotUpErrorMsg, ServiceName)
 			testFunc(fi)
 		})
 }
