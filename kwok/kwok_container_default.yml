@@ -1,0 +1,16 @@
+---
+#
+# Save the output of this file and use kubectl create -f to import
+# it into Kubernetes.
+# Created with podman-4.5.1
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kwok-pod
+spec:
+  containers:
+    - image: kwok
+      name: kwok
+      ports:
+        - containerPort: 8080
+          hostPort: 8080
