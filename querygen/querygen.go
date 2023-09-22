@@ -180,3 +180,28 @@ func GenReleaseCompletedQuery(index string) string {
 		String()
 	return q
 }
+
+// GenPullRequestCreatedQuery returns a Splunk query for generating Segment events
+// whenever a Pull request is created in the users GitHub repository.
+func GenPullRequestCreatedQuery(index string) string {
+	q, _ := NewUserJourneyQuery(index).
+		WithPredicate(
+			`verb=update `+
+				`"responseStatus.code"=200 `+
+				`"objectRef.apiGroup"="appstudio.redhat.com" `+
+				`"objectRef.resource"="components" `+
+				`"user.username"="system:serviceaccount:build-service:build-service-controller-manager" `+
+				`"responseObject.metadata.annotations.build.appstudio.openshift.io/status"="*pac*" `+
+				`(NOT "responseObject.metadata.annotations.build.appstudio.openshift.io/request"="*")`,
+		).
+		WithCommands(
+			`spath input="responseObject.metadata.annotations.build.appstudio.openshift.io/status", path=pac.state output=build_status.pac.state`,
+			`search "build_status.pac.state"="enabled"`,
+			`spath input="responseObject.metadata.annotations.build.appstudio.openshift.io/status", path=pac.merge-url output=build_status.pac.merge-url`,
+			`dedup build_status.pac.merge-url sortby +_time`,
+		).
+		WithEventExpr(`"Pull request created"`).
+		WithFields("namespace", "name", "application", "component", "merge_url", "src_url", "src_revision").
+		String()
+	return q
+}
