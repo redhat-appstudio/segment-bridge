@@ -2,141 +2,164 @@
 // events from the RHTAP K8s event log.
 package querygen
 
+import "fmt"
+
 // GenApplicationQuery returns a Splunk query for generating Segment events
 // representing AppStudio Application object events.
 func GenApplicationQuery(index string) string {
-	q, _ := UserJourneyQueryGen(
-		index,
-		`verb=create `+
-			`"responseStatus.code" IN (200, 201) `+
-			`"objectRef.apiGroup"="appstudio.redhat.com" `+
-			`"objectRef.resource"="applications" `+
-			`("impersonatedUser.username"="*" OR (user.username="*" AND NOT user.username="system:*")) `+
-			`(verb!=create OR "responseObject.metadata.resourceVersion"="*")`,
-		[]string{"name", "userId"},
-	)
+	q, _ := NewUserJourneyQuery(index).
+		WithPredicate(
+			`verb=create `+
+				`"responseStatus.code" IN (200, 201) `+
+				`"objectRef.apiGroup"="appstudio.redhat.com" `+
+				`"objectRef.resource"="applications" `+
+				`("impersonatedUser.username"="*" OR (user.username="*" AND NOT user.username="system:*")) `+
+				`(verb!=create OR "responseObject.metadata.resourceVersion"="*")`,
+		).
+		WithFields("name", "userId").
+		String()
 	return q
 }
 
 // GenBuildPipelineRunCreatedQuery returns a Splunk query for generating Segment events
 // representing creation of AppStudio build PipelineRuns.
 func GenBuildPipelineRunCreatedQuery(index string) string {
-	q, _ := UserJourneyQueryGen(
-		index,
-		`verb=create `+
-			`"responseStatus.code" IN (200, 201) `+
-			`"objectRef.apiGroup"="tekton.dev" `+
-			`"objectRef.resource"="pipelineruns" `+
-			`"responseObject.metadata.labels.pipelines.appstudio.openshift.io/type"=build `+
-			`"responseObject.metadata.resourceVersion"="*" `+
-			`| eval event="Build PipelineRun created" `,
-		[]string{
-			"namespace", "application", "component",
-			"repo", "commit_sha", "target_branch",
-		},
-	)
+	q, _ := NewUserJourneyQuery(index).
+		WithPredicate(
+			`verb=create `+
+				`"responseStatus.code" IN (200, 201) `+
+				`"objectRef.apiGroup"="tekton.dev" `+
+				`"objectRef.resource"="pipelineruns" `+
+				`"responseObject.metadata.labels.pipelines.appstudio.openshift.io/type"=build `+
+				`"responseObject.metadata.resourceVersion"="*"`,
+		).
+		WithEventExpr(`"Build PipelineRun created"`).
+		WithFields("namespace", "application", "component", "repo", "commit_sha", "target_branch").
+		String()
 	return q
 }
 
 // GenBuildPipelineRunStartedQuery returns a Splunk query for generating Segment events
 // representing the start of AppStudio build PipelineRuns.
 func GenBuildPipelineRunStartedQuery(index string) string {
-	q, _ := UserJourneyQueryGen(
-		index,
-		`verb=update `+
-			`"responseStatus.code"=200 `+
-			`"objectRef.apiGroup"="tekton.dev" `+
-			`"objectRef.resource"="pipelineruns" `+
-			`"objectRef.subresource"="status" `+
-			`"responseObject.metadata.labels.pipelines.appstudio.openshift.io/type"=build `+
-			`"responseObject.metadata.resourceVersion"="*" `+
-			`"responseObject.status.startTime"="*" `+
-			`| eval event="Build PipelineRun started" `+
-			`| spath path=responseObject.status.conditions{} output=conditions `+
-			`| mvexpand conditions `+
-			`| spath input=conditions `+
-			`| where type="Succeeded" AND reason="Running" AND like(message, "Tasks Completed: 0 %") `,
-		[]string{"namespace", "application", "component"},
-	)
+	statusFilter := NewStatusConditionFilter("Succeeded")
+	statusFilter.opts.reasons = []string{"Running"}
+	statusFilter.opts.message = "Tasks Completed: 0 %"
+
+	q, _ := NewUserJourneyQuery(index).
+		WithPredicate(
+			`verb=update `+
+				`"responseStatus.code"=200 `+
+				`"objectRef.apiGroup"="tekton.dev" `+
+				`"objectRef.resource"="pipelineruns" `+
+				`"objectRef.subresource"="status" `+
+				`"responseObject.metadata.labels.pipelines.appstudio.openshift.io/type"=build `+
+				`"responseObject.metadata.resourceVersion"="*" `+
+				`"responseObject.status.startTime"="*"`,
+		).
+		WithFilter(statusFilter).
+		WithEventExpr(`"Build PipelineRun started"`).
+		WithFields("namespace", "application", "component").
+		String()
 	return q
 }
 
 // GenClairScanCompletedQuery returns a Splunk query for generating Segment events
 // when the clair-scan task completes.
 func GenClairScanCompletedQuery(index string) string {
-	q, _ := UserJourneyQueryGen(
-		index,
-		`verb=update `+
-			`"responseStatus.code"=200 `+
-			`"objectRef.apiGroup"="tekton.dev" `+
-			`"objectRef.resource"="taskruns" `+
-			`"objectRef.subresource"="status" `+
-			`"requestObject.metadata.labels.tekton.dev/pipelineTask"="clair-scan" `+
-			`"responseObject.status.completionTime"="*" `+
-			`| spath responseObject.status.conditions{} `+
-			`| mvexpand responseObject.status.conditions{} `+
-			`| search responseObject.status.conditions{}.type="Succeeded" `+
-			`responseObject.status.conditions{}.reason="Succeeded" `+
-			`responseObject.status.conditions{}.status="True" `+
-			`| spath responseObject.status.taskResults{} `+
-			`| mvexpand responseObject.status.taskResults{} `+
-			`| search responseObject.status.taskResults{}.name="CLAIR_SCAN_RESULT" `+
-			`| spath input=responseObject.status.taskResults{}.value path=vulnerabilities.critical output=clair_scan_result.vulnerabilities.critical `+
-			`| spath input=responseObject.status.taskResults{}.value path=vulnerabilities.high output=clair_scan_result.vulnerabilities.high `+
-			`| spath input=responseObject.status.taskResults{}.value path=vulnerabilities.medium output=clair_scan_result.vulnerabilities.medium `+
-			`| spath input=responseObject.status.taskResults{}.value path=vulnerabilities.low output=clair_scan_result.vulnerabilities.low `+
-			`| eval event="Clair scan TaskRun completed"`,
-		[]string{"namespace", "application", "component", "vulnerabilities_critical", "vulnerabilities_high", "vulnerabilities_medium", "vulnerabilities_low"},
-	)
+	statusFilter := NewStatusConditionFilter("Succeeded")
+	statusFilter.opts.reasons = []string{"Succeeded"}
+	statusFilter.opts.statuses = []string{"True"}
+
+	trFilter := NewTektonTaskResultFilter("CLAIR_SCAN_RESULT")
+
+	q, _ := NewUserJourneyQuery(index).
+		WithPredicate(
+			`verb=update `+
+				`"responseStatus.code"=200 `+
+				`"objectRef.apiGroup"="tekton.dev" `+
+				`"objectRef.resource"="taskruns" `+
+				`"objectRef.subresource"="status" `+
+				`"requestObject.metadata.labels.tekton.dev/pipelineTask"="clair-scan" `+
+				`"responseObject.status.completionTime"="*"`,
+		).
+		WithFilter(statusFilter).
+		WithFilter(trFilter).
+		WithCommands(
+			fmt.Sprintf(`eval clair_scan_result=%s`, trFilter.FieldSet()["tekton_task_result"].srcExpr),
+			`spath input=clair_scan_result, path=vulnerabilities.critical output=clair_scan_result.vulnerabilities.critical`,
+			`spath input=clair_scan_result, path=vulnerabilities.high output=clair_scan_result.vulnerabilities.high`,
+			`spath input=clair_scan_result, path=vulnerabilities.medium output=clair_scan_result.vulnerabilities.medium`,
+			`spath input=clair_scan_result, path=vulnerabilities.low output=clair_scan_result.vulnerabilities.low`,
+		).
+		WithEventExpr(`"Clair scan TaskRun completed"`).
+		WithFields(
+			"namespace", "application", "component",
+			"vulnerabilities_critical", "vulnerabilities_high",
+			"vulnerabilities_medium", "vulnerabilities_low",
+		).
+		String()
 	return q
 }
 
 // GenBuildPipelineRunCompletedQuery returns a Splunk query for generating Segment events
 // representing success or failure of AppStudio build PipelineRuns.
 func GenBuildPipelineRunCompletedQuery(index string) string {
-	q, _ := UserJourneyQueryGen(
-		index,
-		`verb=update `+
-			`"responseStatus.code"=200 `+
-			`"objectRef.apiGroup"="tekton.dev" `+
-			`"objectRef.resource"="pipelineruns" `+
-			`"objectRef.subresource"="status" `+
-			`"responseObject.metadata.labels.pipelines.appstudio.openshift.io/type"=build `+
-			`"responseObject.metadata.resourceVersion"="*" `+
-			`"responseObject.status.completionTime"="*" `+
-			`| spath responseObject.status.conditions{}`+
-			`| mvexpand responseObject.status.conditions{}`+
-			`| search responseObject.status.conditions{}.type="Succeeded" AND `+
-			`(responseObject.status.conditions{}.reason="Completed" OR `+
-			`responseObject.status.conditions{}.reason="Failed")`+
-			`| eval event="Build PipelineRun ".mvindex('responseObject.status.conditions{}.reason', 0)`,
-		[]string{
+	statusFilter := NewStatusConditionFilter("Succeeded")
+	statusFilter.opts.reasons = []string{"Completed", "Failed"}
+
+	eventExpr := fmt.Sprintf(
+		`"Build PipelineRun ".%s`,
+		statusFilter.FieldSet()["status_reason"].srcExpr,
+	)
+
+	q, _ := NewUserJourneyQuery(index).
+		WithPredicate(
+			`verb=update `+
+				`"responseStatus.code"=200 `+
+				`"objectRef.apiGroup"="tekton.dev" `+
+				`"objectRef.resource"="pipelineruns" `+
+				`"objectRef.subresource"="status" `+
+				`"responseObject.metadata.labels.pipelines.appstudio.openshift.io/type"=build `+
+				`"responseObject.metadata.resourceVersion"="*" `+
+				`"responseObject.status.completionTime"="*"`,
+		).
+		WithFilter(statusFilter).
+		WithEventExpr(eventExpr).
+		WithFields(
 			"namespace", "application", "component",
 			"status_message", "status_reason",
 			"repo", "commit_sha", "target_branch",
-		},
-	)
+		).
+		String()
+
 	return q
 }
 
 // GenReleaseCompletedQuery returns a Splunk query for generating Segment events
 // representing the Release resource success/failure state changes.
 func GenReleaseCompletedQuery(index string) string {
-	q, _ := UserJourneyQueryGen(
-		index,
-		`verb=patch `+
-			`"responseStatus.code"=200 `+
-			`"objectRef.apiGroup"="appstudio.redhat.com" `+
-			`"objectRef.resource"="releases" `+
-			`"objectRef.subresource"="status" `+
-			`"responseObject.metadata.resourceVersion"="*" `+
-			`"responseObject.status.completionTime"="*" `+
-			`| spath path=responseObject.status.conditions{} output=conditions `+
-			`| mvexpand conditions `+
-			`| spath input=conditions `+
-			`| search type="Released" AND (reason="Succeeded" OR reason="Failed") `+
-			`| eval event="Release ".mvindex('responseObject.status.conditions{}.reason', 0)`,
-		[]string{"namespace", "name", "status_message", "status_reason"},
+	statusFilter := NewStatusConditionFilter("Released")
+	statusFilter.opts.reasons = []string{"Succeeded", "Failed"}
+
+	eventExpr := fmt.Sprintf(
+		`"Release ".%s`,
+		statusFilter.FieldSet()["status_reason"].srcExpr,
 	)
+
+	q, _ := NewUserJourneyQuery(index).
+		WithPredicate(
+			`verb=patch `+
+				`"responseStatus.code"=200 `+
+				`"objectRef.apiGroup"="appstudio.redhat.com" `+
+				`"objectRef.resource"="releases" `+
+				`"objectRef.subresource"="status" `+
+				`"responseObject.metadata.resourceVersion"="*" `+
+				`"responseObject.status.completionTime"="*"`,
+		).
+		WithFilter(statusFilter).
+		WithEventExpr(eventExpr).
+		WithFields("namespace", "name", "status_reason", "status_message").
+		String()
 	return q
 }

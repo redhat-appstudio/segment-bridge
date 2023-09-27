@@ -21,7 +21,9 @@ const (
 //
 // The zero value for the value struct defines that the output field is copied
 // as-is from the input.
-type FieldSet map[string]struct {
+type FieldSet map[string]*FieldSetSpec
+
+type FieldSetSpec struct {
 	// srcFields defines which input fields to use. Each field in the list is
 	// used as a fallback for when all the fields that precede it are NULL.
 	srcFields []string
