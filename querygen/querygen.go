@@ -21,6 +21,23 @@ func GenApplicationQuery(index string) string {
 	return q
 }
 
+// GenComponentQuery returns a Splunk query for generating Segment events
+// representing AppStudio Component object events.
+func GenComponentQuery(index string) string {
+	q, _ := NewUserJourneyQuery(index).
+		WithPredicate(
+			`verb IN (create, update, delete) `+
+				`"responseStatus.code" IN (200, 201) `+
+				`"objectRef.apiGroup"="appstudio.redhat.com" `+
+				`"objectRef.resource"="components" `+
+				`("impersonatedUser.username"="*" OR (user.username="*" AND NOT user.username="system:*")) `+
+				`(verb!=create OR "responseObject.metadata.resourceVersion"="*")`,
+		).
+		WithFields("name", "userId", "application", "component", "src_url", "src_revision").
+		String()
+	return q
+}
+
 // GenBuildPipelineRunCreatedQuery returns a Splunk query for generating Segment events
 // representing creation of AppStudio build PipelineRuns.
 func GenBuildPipelineRunCreatedQuery(index string) string {

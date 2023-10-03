@@ -54,9 +54,15 @@ func NewUserJourneyQuery(index string) *UserJourneyQuery {
 			"apiVersion":    {subObj: "properties", srcFields: []string{"objectRef.apiVersion"}},
 			"kind":          {subObj: "properties", srcFields: []string{"objectRef.resource"}},
 			"name":          {subObj: "properties", srcFields: []string{"objectRef.name"}},
+			"src_url":       {subObj: "properties", srcFields: []string{"responseObject.spec.source.git.url"}},
+			"src_revision":  {subObj: "properties", srcFields: []string{"responseObject.spec.source.git.revision"}},
+			"src_context":   {subObj: "properties", srcFields: []string{"responseObject.spec.source.git.context"}},
 			"application": {
 				subObj:    "properties",
-				srcFields: []string{"responseObject.metadata.labels.appstudio.openshift.io/application"},
+				srcFields: []string{
+					"responseObject.spec.application",
+					"responseObject.metadata.labels.appstudio.openshift.io/application",
+				},
 			},
 			"commit_sha": {
 				subObj:    "properties",
@@ -64,7 +70,10 @@ func NewUserJourneyQuery(index string) *UserJourneyQuery {
 			},
 			"component": {
 				subObj:    "properties",
-				srcFields: []string{"responseObject.metadata.labels.appstudio.openshift.io/component"},
+				srcFields: []string{
+					"responseObject.spec.componentName",
+					"responseObject.metadata.labels.appstudio.openshift.io/component",
+				},
 			},
 			"repo": {
 				subObj:    "properties",
