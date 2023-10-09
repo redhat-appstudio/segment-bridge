@@ -1,11 +1,11 @@
 # First stage: Build the Go binaries
-FROM registry.redhat.io/rhel8/go-toolset:1.19.10-16.1695267225 AS builder
+FROM registry.access.redhat.com/ubi8/go-toolset:1.19.10-16.1696540524 AS builder
 WORKDIR /opt/app-root/src
 COPY --chown=default:root . .
 RUN go build -o /opt/app-root/build/ ./cmd/...
 
 # Second stage: Create the final container image
-FROM registry.redhat.io/openshift4/ose-tools-rhel8:v4.13.0-202308291002.p0.g17b7acc.assembly.stream
+FROM registry.redhat.io/openshift4/ose-tools-rhel8:v4.13.0-202309181427.p0.g17b7acc.assembly.stream
 
 LABEL \
     description="Tooling for routing selected K8s API event to Segment" \
