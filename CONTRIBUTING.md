@@ -19,15 +19,14 @@ only a small amount of memory.
 
 To run the Kwok container with the Kwok Kubernetes tool, follow these steps:
 
-1. Build the Kwok cluster by running the following command `cd kwok` and:
+1. Build the kwok container using the following command:
+   ```
+   podman build --build-arg CLUSTER_NAME=kwok-cluster -t kwok -f kwok/Dockerfile .
+   ```
+2. Bring the cluster up by running the following command from the 
+   repo's root directory:
     ```
-    podman build --build-arg CLUSTER_NAME=<cluster-name> -t <image-name> -f Dockerfile .
-    ```
-
-2. Bring the cluster up by updating the `image` from
-   `kwok_container_template.yml`, and run the following cmd:
-    ```
-    podman kube play kwok_container_template.yml
+    podman kube play kwok/kwok_container_default.yml
     ```
 
 3. Check `podman pod list` should list the below pod
@@ -61,21 +60,29 @@ Now you can access the cluster using kubectl, e.g.: `kubectl get ns`.
 To set up a containerized Splunk instance, you can use either podman or docker.
 Follow these steps:
 
-1. Build and Run the Splunk instance by running the below cmd:
+1. Build the Splunk container using the following command:
    ```
-   podman play kube splunk/splunk_container_template.yaml
+   podman build -t splunk ./splunk
    ```
-    For more information about the specific command inputs and options, refer
-    to the [Splunk documentation][CS1].
-2. Once the container is running, you can log in to the Splunk instance using
+2. Run the Splunk instance by running the below command:
+   ```
+   podman play kube splunk/splunk_container_default.yaml
+   ```
+   For more information about the specific command inputs and options, refer
+   to the [Splunk documentation][CS1].
+3. Once the container is running, you can log in to the Splunk instance using
    the username `admin` and the password you set up.
-3. To access the Splunk [REST API][CS2],
+4. To access the Splunk [REST API][CS2],
    you can make API calls from outside the container using the `curl` command.
    For example, you can run the following command to search all data:
      ```
      curl -u admin:YourPassword -k https://localhost:8089/services/search/jobs -d search="search *"
      ```
-4. If you want to use the Splunk UI, open a web browser on the host and navigate to
+    you may also use the dedicated .netrc file and authenticate with it instead:
+    ```
+     curl --netrc-file -k https://localhost:8089/services/search/jobs -d search="search *"
+    ```
+5. If you want to use the Splunk UI, open a web browser on the host and navigate to
    `localhost:8000`.
 
 [CS1]:
@@ -121,22 +128,23 @@ _tests.go and with .go.
 1. Clone your fork of the project.
 2. Navigate to the project's root directory
 3. To run all the Go unit tests in the repository,
-execute the following command `go test ./...`
+execute the following command `go clean -testcache && go test ./...`
+a similar output is expected:
 
-```
-?   	github.com/redhat-appstudio/segment-bridge.git/cmd/querygen	[no test files]
-ok  	github.com/redhat-appstudio/segment-bridge.git/querygen	0.002s
-ok  	github.com/redhat-appstudio/segment-bridge.git/queryprint	(cached)
-ok  	github.com/redhat-appstudio/segment-bridge.git/scripts	0.002s
-ok  	github.com/redhat-appstudio/segment-bridge.git/segment	(cached)
-ok  	github.com/redhat-appstudio/segment-bridge.git/stats	(cached)
-ok  	github.com/redhat-appstudio/segment-bridge.git/webfixture	(cached)
-```
+    ```
+    ?   	github.com/redhat-appstudio/segment-bridge.git/cmd/querygen	[no test files]
+    ok  	github.com/redhat-appstudio/segment-bridge.git/querygen	0.002s
+    ok  	github.com/redhat-appstudio/segment-bridge.git/queryprint 0.002s
+    ok  	github.com/redhat-appstudio/segment-bridge.git/scripts	0.002s
+    ok  	github.com/redhat-appstudio/segment-bridge.git/segment	0.002s
+    ok  	github.com/redhat-appstudio/segment-bridge.git/stats	0.002s
+    ok  	github.com/redhat-appstudio/segment-bridge.git/webfixture	0.002s
+    ```
 4. If you want to run tests for a specific directory/path, you can do so by providing
 the package path, like this:
-```
-go test ./querygen
-```
+    ```
+    go test ./querygen
+    ```
 
 #### Test Coverage
 [TBD]

@@ -21,7 +21,9 @@ const (
 //
 // The zero value for the value struct defines that the output field is copied
 // as-is from the input.
-type FieldSet map[string]struct {
+type FieldSet map[string]*FieldSetSpec
+
+type FieldSetSpec struct {
 	// srcFields defines which input fields to use. Each field in the list is
 	// used as a fallback for when all the fields that precede it are NULL.
 	srcFields []string
@@ -38,18 +40,14 @@ type FieldSet map[string]struct {
 // the given fields. The values for the fields and how to present them in the
 // output are determined from the FieldSet
 func (fs FieldSet) QueryGen(searchExpr string, fields []string) (string, error) {
-	var queryElements, dedupFields, evalElements []string
+	var queryElements, evalElements []string
 	var err error
-	if dedupFields, err = fs.collectDedupFields(fields); err != nil {
-		return "", err
-	}
 	if evalElements, err = fs.collectEvalElements(fields); err != nil {
 		return "", err
 	}
 	queryElements = append(
 		queryElements,
 		searchExpr,
-		GenDedupEval(dedupFields),
 	)
 	if len(evalElements) > 0 {
 		queryElements = append(queryElements, "eval "+commaSep(evalElements))
@@ -64,32 +62,6 @@ func (fs FieldSet) QueryGen(searchExpr string, fields []string) (string, error) 
 
 func commaSep(words []string) string {
 	return strings.Join(words, ",")
-}
-
-// collectDedupFields generates the list of input fields that need to have their
-// values be de-duplicated from the given list of fields.
-func (fs FieldSet) collectDedupFields(fields []string) ([]string, error) {
-	var dedupFields []string
-	seenFields := map[string]bool{}
-	for _, field := range fields {
-		if spec, ok := fs[field]; ok {
-			var fieldsToAdd []string
-			if len(spec.srcFields) > 0 {
-				fieldsToAdd = spec.srcFields
-			} else if spec.srcExpr == "" {
-				fieldsToAdd = []string{field}
-			}
-			for _, f := range fieldsToAdd {
-				if !seenFields[f] {
-					seenFields[f] = true
-					dedupFields = append(dedupFields, f)
-				}
-			}
-		} else {
-			return []string{}, fmt.Errorf(`no field specification for: "%s"`, field)
-		}
-	}
-	return dedupFields, nil
 }
 
 // collectEvalElements generates a list of Splunk `eval` expressions for

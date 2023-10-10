@@ -34,3 +34,13 @@ func TestGenBuildPipelineRunCompletedQuery(t *testing.T) {
 	out := GenBuildPipelineRunCompletedQuery("some_index")
 	assert.NotEqual(t, "", out)
 }
+
+func TestGenReleaseCompletedQuery(t *testing.T) {
+	out := GenReleaseCompletedQuery("some_index")
+	assert.NotEqual(t, "", out)
+}
+
+func TestGenPullRequestCreatedQuery(t *testing.T) {
+	out := GenPullRequestCreatedQuery("some_index")
+	assert.NotEqual(t, "", out)
+}
