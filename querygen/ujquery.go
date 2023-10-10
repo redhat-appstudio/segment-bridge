@@ -58,7 +58,7 @@ func NewUserJourneyQuery(index string) *UserJourneyQuery {
 			"src_revision":  {subObj: "properties", srcFields: []string{"responseObject.spec.source.git.revision"}},
 			"src_context":   {subObj: "properties", srcFields: []string{"responseObject.spec.source.git.context"}},
 			"application": {
-				subObj:    "properties",
+				subObj: "properties",
 				srcFields: []string{
 					"responseObject.spec.application",
 					"responseObject.metadata.labels.appstudio.openshift.io/application",
@@ -69,7 +69,7 @@ func NewUserJourneyQuery(index string) *UserJourneyQuery {
 				srcFields: []string{"responseObject.metadata.annotations.build.appstudio.redhat.com/commit_sha"},
 			},
 			"component": {
-				subObj:    "properties",
+				subObj: "properties",
 				srcFields: []string{
 					"responseObject.spec.componentName",
 					"responseObject.metadata.labels.appstudio.openshift.io/component",
@@ -111,6 +111,10 @@ func NewUserJourneyQuery(index string) *UserJourneyQuery {
 			"vulnerabilities_low": {
 				subObj:    "properties",
 				srcFields: []string{"clair_scan_result.vulnerabilities.low"},
+			},
+			"merge_url": {
+				subObj:    "properties",
+				srcFields: []string{"build_status.pac.merge-url"},
 			},
 		},
 	}

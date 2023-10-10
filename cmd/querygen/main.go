@@ -63,12 +63,16 @@ func main() {
 			Query: querygen.GenClairScanCompletedQuery(*index),
 		},
 		{
-			Title: "Build PipelineRun Completed or Failed event",
+			Title: "Build PipelineRun Completed or Failed events",
 			Query: querygen.GenBuildPipelineRunCompletedQuery(*index),
 		},
 		{
 			Title: "Release Succeeded or Failed events",
 			Query: querygen.GenReleaseCompletedQuery(*index),
+		},
+		{
+			Title: "Pull Request created events",
+			Query: querygen.GenPullRequestCreatedQuery(*index),
 		},
 	}))
 }
