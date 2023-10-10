@@ -37,3 +37,12 @@ func pushToPath(dir string) error {
 	newOsPath := fmt.Sprintf("%s%c%s", dir, filepath.ListSeparator, osPath)
 	return os.Setenv("PATH", newOsPath)
 }
+
+func GetRepoRootDir() (string, error) {
+	_, filename, _, ok := runtime.Caller(0)
+	if !ok {
+		return "", fmt.Errorf("failed to find the path of the root directory")
+	}
+	dirPath := filepath.Dir(filepath.Dir(filename))
+	return dirPath, nil
+}

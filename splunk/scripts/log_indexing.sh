@@ -12,10 +12,9 @@ done
 
 timeout_start=$(date +%s)
 while true; do
-    if ! curl --insecure --user admin:"$SPLUNK_PASSWORD" "$endpoint" --get --data output_mode=json \
+    if curl --insecure --user admin:"$SPLUNK_PASSWORD" "$endpoint" --get --data output_mode=json \
     | jq -e '.paging.total == 0'
     then
-        echo "Waiting for log indexing to complete." >&2
         break
     fi
     if [[ "$(($(date +%s) - timeout_start))" -ge 60 ]]
@@ -23,6 +22,7 @@ while true; do
         echo "Log indexing did not complete within the expected time. Exiting." >&2
         exit 1
     fi
+    echo "Waiting for log indexing to complete." >&2
     sleep 5
 done
 

@@ -5,16 +5,18 @@ metadata:
   name: {{ .PodName}}
 spec:
   containers:
-  - args:
-    - start-service
-    env:
-    - name: SPLUNK_START_ARGS
-      value: --accept-license
-    - name: SPLUNK_PASSWORD
-      value: Password
-    image: splunk
-    ports:
-    - containerPort: 8000
-      hostPort: {{ .WebPort}}
-    - containerPort: 8089
-      hostPort: {{ .ApiPort}}
+    - args:
+        - start-service
+      env:
+        - name: SPLUNK_START_ARGS
+          value: '--accept-license'
+        - name: SPLUNK_PASSWORD
+          value: Password
+      image: splunk
+      name: splunk
+      ports:
+        - containerPort: 8000
+          hostPort: {{ .WebPort}}
+        - containerPort: 8089
+          hostPort: {{ .ApiPort}}
+
