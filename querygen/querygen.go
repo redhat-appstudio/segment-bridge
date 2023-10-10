@@ -51,7 +51,8 @@ func GenBuildPipelineRunCreatedQuery(index string) string {
 				`"responseObject.metadata.resourceVersion"="*"`,
 		).
 		WithEventExpr(`"Build PipelineRun created"`).
-		WithFields("namespace", "application", "component", "repo", "commit_sha", "target_branch").
+		WithFields("namespace", "application", "component", "repo", "commit_sha", "target_branch",
+			"git_trigger_event_type", "git_trigger_provider", "pipeline_log_url").
 		String()
 	return q
 }
@@ -76,7 +77,8 @@ func GenBuildPipelineRunStartedQuery(index string) string {
 		).
 		WithFilter(statusFilter).
 		WithEventExpr(`"Build PipelineRun started"`).
-		WithFields("namespace", "application", "component").
+		WithFields("namespace", "application", "component",
+			"git_trigger_event_type", "git_trigger_provider", "pipeline_log_url").
 		String()
 	return q
 }
@@ -147,7 +149,8 @@ func GenBuildPipelineRunCompletedQuery(index string) string {
 			"namespace", "application", "component",
 			"status_message", "status_reason",
 			"repo", "commit_sha", "target_branch",
-		).
+			"git_trigger_event_type", "git_trigger_provider",
+			 "pipeline_log_url").
 		String()
 
 	return q

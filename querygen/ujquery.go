@@ -84,6 +84,18 @@ func NewUserJourneyQuery(index string) *UserJourneyQuery {
 				subObj:    "properties",
 				srcFields: []string{"responseObject.metadata.annotations.build.appstudio.redhat.com/target_branch"},
 			},
+			"git_trigger_event_type": {
+				subObj:    "properties",
+				srcFields: []string{"responseObject.metadata.annotations.pipelinesascode.tekton.dev/event-type"},
+			},
+			"git_trigger_provider": {
+				subObj:    "properties",
+				srcFields: []string{"responseObject.metadata.annotations.pipelinesascode.tekton.dev/git-provider"},
+			},
+			"pipeline_log_url": {
+				subObj:    "properties",
+				srcFields: []string{"responseObject.metadata.annotations.pipelinesascode.tekton.dev/log-url"},
+			},
 			"vulnerabilities_critical": {
 				subObj:    "properties",
 				srcFields: []string{"clair_scan_result.vulnerabilities.critical"},
