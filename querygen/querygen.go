@@ -26,7 +26,7 @@ func GenApplicationQuery(index string) string {
 func GenComponentQuery(index string) string {
 	q, _ := NewUserJourneyQuery(index).
 		WithPredicate(
-			`verb IN (create, update, delete) `+
+			`verb IN (create, update, delete, patch) `+
 				`"responseStatus.code" IN (200, 201) `+
 				`"objectRef.apiGroup"="appstudio.redhat.com" `+
 				`"objectRef.resource"="components" `+

@@ -48,7 +48,20 @@ func NewUserJourneyQuery(index string) *UserJourneyQuery {
 			"userAgent":     {subObj: "context"},
 			"userId":        {srcFields: []string{"impersonatedUser.username", "user.username"}},
 			"namespace":     {srcFields: []string{"objectRef.namespace"}},
-			"event_verb":    {srcFields: []string{"verb"}},
+			"event_verb":    {
+				srcExpr: `case(
+					'objectRef.resource'=="components"
+					AND verb=="patch"
+					AND spath(_raw,"requestObject{0}.path")=="/metadata/annotations/build.appstudio.openshift.io~1request",
+					spath(_raw, "requestObject{0}.value"),
+					'objectRef.resource'=="components"
+					AND verb=="patch"
+					AND NOT isnull('requestObject.metadata.annotations.build.appstudio.openshift.io/request'),
+					'requestObject.metadata.annotations.build.appstudio.openshift.io/request',
+					true(),
+					'verb'
+					)`,
+			},
 			"event_subject": {srcFields: []string{"objectRef.resource"}},
 			"apiGroup":      {subObj: "properties", srcFields: []string{"objectRef.apiGroup"}},
 			"apiVersion":    {subObj: "properties", srcFields: []string{"objectRef.apiVersion"}},
