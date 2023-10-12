@@ -157,8 +157,9 @@ the package path, like this:
 
 ### Before submitting the PR
 
-1. Ensure to run `gofmt` to format your code.
-2. Make sure all unit tests are passing.
+1. The repository enforces pre-commit checks. Ensure installing `pre-commit` using `pip install -r requirements.lock` running `pre-commit run --all-files` and fixing any issues raised before committing any changes.
+2. Ensure to run `gofmt` to format your code.
+3. Make sure all unit tests are passing.
 
 ### Commit Messages
 We use [gitlint](https://jorisroovers.com/gitlint/) to standardize commit messages,
