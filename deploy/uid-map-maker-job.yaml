@@ -1,34 +1,36 @@
+---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: uid-map-maker
 spec:
-  schedule: "@hourly"
-  successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 10
   jobTemplate:
     spec:
       template:
         spec:
+          containers:
+            - command:
+                - uid-map-maker-job.sh
+              env:
+                - name: KUBECONFIG
+                  value: ''
+                - name: KUBECONFIG_SRC
+                  value: /usr/local/etc/kube-config/kube-config
+              image: >-
+                image-registry.openshift-image-registry.svc:5000/rhtap-o11y--runtime-int/segment-bridge-job
+              imagePullPolicy: Always
+              name: uid-map-maker
+              tty: true
+              volumeMounts:
+                - mountPath: /usr/local/etc/kube-config
+                  name: kube-config
+                  readOnly: true
           restartPolicy: Never
           serviceAccount: map-maker
-          containers:
-          - name: uid-map-maker
-            image: image-registry.openshift-image-registry.svc:5000/rhtap-o11y--runtime-int/segment-bridge-job
-            imagePullPolicy: Always
-            command:
-              - "uid-map-maker-job.sh"
-            tty: true
-            volumeMounts:
-            - mountPath: /usr/local/etc/kube-config
-              name: kube-config
-              readOnly: true
-            env:
-            - name: KUBECONFIG
-              value: ""
-            - name: KUBECONFIG_SRC
-              value: "/usr/local/etc/kube-config/kube-config"
           volumes:
-          - name: kube-config
-            secret:
-              secretName: kube-config
+            - name: kube-config
+              secret:
+                secretName: kube-config
+  schedule: '@hourly'
+  successfulJobsHistoryLimit: 3

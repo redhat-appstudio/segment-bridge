@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-//go:embed kwok_container_template.yml
+//go:embed kwok_container_template.tmpl
 var kwokServiceManifest string
 
 func TestGetUIDMap(t *testing.T) {
