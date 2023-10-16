@@ -4,3 +4,10 @@ repos:
       - id: yamllint
     repo: https://github.com/adrienverge/yamllint
     rev: v1.29.0
+  - hooks:
+      - id: gitlint
+        name: gitlint
+        entry: gitlint
+        stages: [commit-msg]
+    repo: https://github.com/jorisroovers/gitlint
+    rev: v0.18.0
