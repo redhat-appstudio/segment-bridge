@@ -16,6 +16,6 @@ spec:
       name: splunk
       ports:
         - containerPort: 8000
-          hostPort: {{ .WebPort}}
+          hostPort: { { .WebPort } }
         - containerPort: 8089
           hostPort: {{ .ApiPort}}
