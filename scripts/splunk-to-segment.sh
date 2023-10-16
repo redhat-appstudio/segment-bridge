@@ -106,17 +106,19 @@ jq \
   --slurpfile evsm <(event_subject_map) \
   'select(.result)
   | .result
-  | .userIdOrWorkspace = (.userId // $wksm[0][.namespace])
-  | select(.userIdOrWorkspace)
-  | .ssoId = $uidm[0][.userIdOrWorkspace]
-  | select(.ssoId)
+  | $wksm[0][.namespace] as $wsUserName
+  | select($wsUserName)
+  | $uidm[0][$wsUserName] as $wsSsoId
+  | select($wsSsoId)
+  | $uidm[0][.userId // $wsUserName] as $ssoId
+  | select($ssoId)
   | {
       messageId,
       timestamp,
       type,
-      userId: .ssoId,
+      userId: $ssoId,
       event: (.event // "\($evsm[0][.event_subject] // .event_subject) \($evvm[0][.event_verb] // .event_verb)"),
-      properties: (.properties|fromjson),
+      properties: (.properties|fromjson|.workspaceID=$wsSsoId),
       context: (.context|fromjson)
     }
   '

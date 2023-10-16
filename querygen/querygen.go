@@ -51,7 +51,7 @@ func GenBuildPipelineRunCreatedQuery(index string) string {
 				`"responseObject.metadata.resourceVersion"="*"`,
 		).
 		WithEventExpr(`"Build PipelineRun created"`).
-		WithFields("namespace", "application", "component", "repo", "commit_sha", "target_branch",
+		WithFields("application", "component", "repo", "commit_sha", "target_branch",
 			"git_trigger_event_type", "git_trigger_provider", "pipeline_log_url").
 		String()
 	return q
@@ -77,7 +77,7 @@ func GenBuildPipelineRunStartedQuery(index string) string {
 		).
 		WithFilter(statusFilter).
 		WithEventExpr(`"Build PipelineRun started"`).
-		WithFields("namespace", "application", "component",
+		WithFields("application", "component",
 			"git_trigger_event_type", "git_trigger_provider", "pipeline_log_url").
 		String()
 	return q
@@ -113,7 +113,7 @@ func GenClairScanCompletedQuery(index string) string {
 		).
 		WithEventExpr(`"Clair scan TaskRun completed"`).
 		WithFields(
-			"namespace", "application", "component",
+			"application", "component",
 			"vulnerabilities_critical", "vulnerabilities_high",
 			"vulnerabilities_medium", "vulnerabilities_low",
 		).
@@ -146,7 +146,7 @@ func GenBuildPipelineRunCompletedQuery(index string) string {
 		WithFilter(statusFilter).
 		WithEventExpr(eventExpr).
 		WithFields(
-			"namespace", "application", "component",
+			"application", "component",
 			"status_message", "status_reason",
 			"repo", "commit_sha", "target_branch",
 			"git_trigger_event_type", "git_trigger_provider",
@@ -179,7 +179,7 @@ func GenReleaseCompletedQuery(index string) string {
 		).
 		WithFilter(statusFilter).
 		WithEventExpr(eventExpr).
-		WithFields("namespace", "name", "status_reason", "status_message").
+		WithFields("name", "status_reason", "status_message").
 		String()
 	return q
 }
@@ -204,7 +204,7 @@ func GenPullRequestCreatedQuery(index string) string {
 			`dedup build_status.pac.merge-url sortby +_time`,
 		).
 		WithEventExpr(`"Pull request created"`).
-		WithFields("namespace", "name", "application", "component", "merge_url", "src_url", "src_revision").
+		WithFields("name", "application", "component", "merge_url", "src_url", "src_revision").
 		String()
 	return q
 }
