@@ -37,6 +37,7 @@ func NewUserJourneyQuery(index string) *UserJourneyQuery {
 			"event_verb",
 			"kind",
 			"messageId",
+			"namespace",
 			"timestamp",
 			"type",
 			"userAgent",
