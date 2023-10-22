@@ -127,11 +127,6 @@ func GenBuildPipelineRunCompletedQuery(index string) string {
 	statusFilter := NewStatusConditionFilter("Succeeded")
 	statusFilter.opts.reasons = []string{"Completed", "Failed"}
 
-	eventExpr := fmt.Sprintf(
-		`"Build PipelineRun ".%s`,
-		statusFilter.FieldSet()["status_reason"].srcExpr,
-	)
-
 	q, _ := NewUserJourneyQuery(index).
 		WithPredicate(
 			`verb=update `+
@@ -144,7 +139,7 @@ func GenBuildPipelineRunCompletedQuery(index string) string {
 				`"responseObject.status.completionTime"="*"`,
 		).
 		WithFilter(statusFilter).
-		WithEventExpr(eventExpr).
+		WithEventExpr(`"Build PipelineRun ended"`).
 		WithFields(
 			"application", "component",
 			"status_message", "status_reason",
@@ -162,11 +157,6 @@ func GenReleaseCompletedQuery(index string) string {
 	statusFilter := NewStatusConditionFilter("Released")
 	statusFilter.opts.reasons = []string{"Succeeded", "Failed"}
 
-	eventExpr := fmt.Sprintf(
-		`"Release ".%s`,
-		statusFilter.FieldSet()["status_reason"].srcExpr,
-	)
-
 	q, _ := NewUserJourneyQuery(index).
 		WithPredicate(
 			`verb=patch `+
@@ -178,7 +168,7 @@ func GenReleaseCompletedQuery(index string) string {
 				`"responseObject.status.completionTime"="*"`,
 		).
 		WithFilter(statusFilter).
-		WithEventExpr(eventExpr).
+		WithEventExpr(`"Release process done"`).
 		WithFields("name", "status_reason", "status_message").
 		String()
 	return q
