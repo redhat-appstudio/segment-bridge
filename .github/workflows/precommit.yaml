@@ -21,3 +21,7 @@ jobs:
         run: pip install -r requirements.lock
       - name: Run pre-commit
         run: pre-commit run --all-files
+      - name: Run gitlint on the latest commit message
+        run: >-
+          pre-commit run gitlint --hook-stage commit-msg --commit-msg-filename
+          .git/COMMIT_EDITMSG
