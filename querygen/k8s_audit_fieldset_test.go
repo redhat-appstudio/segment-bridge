@@ -11,17 +11,19 @@ func TestK8sAuditFieldSet_QueryGen(t *testing.T) {
 		K8sApiId{}: {
 			"plain_field":  {},
 			"override_field": {},
+			"override_field2": {},
 		},
 		K8sApiId{"api1.com", "SomeObj"}: {
 			"override_field": {srcFields: []string{"other_field"}},
 		},
 	}
-	fields := []string{"plain_field", "override_field"}
-	includeFieldsCmd := `fields override_field,plain_field`
+	fields := []string{"plain_field", "override_field", "override_field2"}
+	includeFieldsCmd := `fields override_field,override_field2,plain_field`
 	type args struct {
 		index      string
 		api        K8sApiId
 		searchExpr string
+		extra	   []FieldSet
 	}
 	tests := []struct {
 		name    string
@@ -58,10 +60,31 @@ func TestK8sAuditFieldSet_QueryGen(t *testing.T) {
 				`|` + includeFieldsCmd +
 				`|` + excludeFieldsCmd,
 		},
+		{
+			name: "Query with extra fields",
+			args: args{
+				index: "some_idx",
+				api: K8sApiId{"api1.com", "SomeObj"},
+				searchExpr: "foo bar baz",
+				extra: []FieldSet{
+					{
+						"override_field2": {srcExpr: "foo()"},
+						"added_field": {},
+					},
+				},
+			},
+			want: `search index="some_idx" log_type=audit ` +
+				`"objectRef.apiGroup"="api1.com" `+
+				`"objectRef.resource"="SomeObj" ` +
+				`foo bar baz` +
+				`|eval override_field='other_field',override_field2=foo()` +
+				`|fields added_field,override_field,override_field2,plain_field` +
+				`|` + excludeFieldsCmd,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := kfs.QueryGen(tt.args.index, tt.args.api, tt.args.searchExpr, fields)
+			got, err := kfs.QueryGen(tt.args.index, tt.args.api, tt.args.searchExpr, fields, tt.args.extra...)
 			if tt.wantErr {
 				require.Error(t, err)
 				return

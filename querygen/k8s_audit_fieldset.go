@@ -21,7 +21,7 @@ type K8sApiId struct {
 type K8sAuditFieldSet map[K8sApiId]FieldSet
 
 func (kfs K8sAuditFieldSet) QueryGen(
-	index string, api K8sApiId, searchExpr string, fields []string,
+	index string, api K8sApiId, searchExpr string, fields []string, extra ...FieldSet,
 ) (string, error) {
 	searchCmd := strings.TrimSpace(fmt.Sprintf(
 		`search index="%s" log_type=audit ` +
@@ -33,9 +33,10 @@ func (kfs K8sAuditFieldSet) QueryGen(
 		api.resource,
 		searchExpr,
 	))
+	allFieldSets := []FieldSet{kfs[K8sApiId{}], kfs[api]}
+	allFieldSets = append(allFieldSets, extra...)
 	fieldSet := FieldSet{}
-	for _, apiId := range []K8sApiId{{}, api} {
-		fieldSetToAdd := kfs[apiId]
+	for _, fieldSetToAdd := range allFieldSets {
 		for fld, spec := range fieldSetToAdd {
 			fieldSet[fld] = spec
 		}
