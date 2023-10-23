@@ -3,12 +3,12 @@
 export SPLUNK_PASSWORD="Password"
 
 # Run an instance of Splunk during the build, to prepare the indexed logs for the tests
-/sbin/entrypoint.sh start-service >> $SPLUNK_HOME/output.log 2>&1 &
+/sbin/entrypoint.sh start-service >> "$SPLUNK_HOME"/output.log 2>&1 &
 
 # Make sure the Splunk service is up
 timeout_start=$(date +%s)
 while true; do
-    if grep -q "Ansible playbook complete" $SPLUNK_HOME/output.log; then
+    if grep -q "Ansible playbook complete" "$SPLUNK_HOME"/output.log; then
         break
     fi
     if [ "$(($(date +%s) - timeout_start))" -ge 120 ]; then
