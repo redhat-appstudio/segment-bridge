@@ -1,5 +1,4 @@
 ---
-#
 # Save the output of this file and use kubectl create -f to import
 # it into Kubernetes.
 # Created with podman-4.5.1

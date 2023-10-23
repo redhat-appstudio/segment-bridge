@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-//go:embed splunk_container_template.yaml
+//go:embed splunk_container_template.tmpl
 var splunkServiceManifest string
 var countPattern = regexp.MustCompile(`(?m)^count\s+(\d+)$`)
 

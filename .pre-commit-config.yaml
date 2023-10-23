@@ -1,0 +1,6 @@
+---
+repos:
+  - hooks:
+      - id: yamllint
+    repo: https://github.com/adrienverge/yamllint
+    rev: v1.29.0
