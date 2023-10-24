@@ -9,7 +9,7 @@ set -o pipefail -o errexit -o nounset
 # Add script file directory to PATH so we can use other scripts in the same
 # directory
 SELFDIR="$(dirname "$0")"
-PATH="$SELFDIR:${PATH#$SELFDIR:}"
+PATH="$SELFDIR:${PATH#"$SELFDIR":}"
 
 # ======= Parameters ======
 # The following variables can be set from outside the script by setting

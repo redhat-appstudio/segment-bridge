@@ -45,7 +45,7 @@ if command -v querygen > /dev/null; then
 elif command -v go > /dev/null; then
   QUERYGEN="go run $GO_PACKAGE/cmd/querygen"
 else
-  echo 'Couldn`t find the querygen binary or go in $PATH' 1>&2
+  echo "Couldn\`t find the querygen binary or go in $PATH" 1>&2
   exit 127
 fi
 
