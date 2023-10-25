@@ -1,0 +1,15 @@
+[general]
+contrib=contrib-title-conventional-commits,contrib-body-requires-signed-off-by
+
+[title-max-length]
+line-length=72
+
+[body-max-line-length]
+line-length=72
+
+[body-first-line-empty]
+
+# Dependabot tends to generate lines that exceed the default 80 char limit.
+[ignore-by-author-name]
+regex=dependabot
+ignore=all
