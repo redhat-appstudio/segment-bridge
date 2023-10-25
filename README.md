@@ -13,13 +13,17 @@ flowchart TB
     end
 
     A2--"Audit Logs"-->C
-    
+
     C[("Splunk")]
 
     A1--"UserSignup resources"-->B1
+    A1--"Namespace resources"-->B5
 
     subgraph B["RHTAP Segment bridge"]
         B1([get-uid-map.sh])
+        B5([get-workspace-map.sh])
+        B6[(uid-map ConfigMap)]
+        B7[(ws-map ConfigMap)]
         B2([fetch-uj-records.sh])
         B3([splunk-to-segment.sh])
         subgraph B4[segment-mass-uploader.sh]
@@ -31,25 +35,20 @@ flowchart TB
             B4A--"events"-->B4B--"batch call payload"-->B4A
         end
 
-        B1--"Username to UID map"-->B3
+        B1-->B6-->B3
+        B5-->B7-->B3
         B2--"Splunk-formatted UJ records"-->B3
         B3--"Segment events"--> B4
     end
 
     C-- "User resource
-     actions" -->B2
+     actions" ---->B2
 
     G([Segment])
     H[(Amplitude)]
 
     B4-- "User resource events
      (Via batch calls)" -->G-->H
-
-    classDef default fill:#f9f9f9,stroke:silver
-    class A,B,C notDefault
-    style A fill:lightcyan,stroke:powderblue
-    style B fill:darkseagreen,stroke:darkgreen
-    style C fill:lightyelloy,stroke:gold
 ```
 **Note:** If you cannot see the drawing above in GitHub, make sure you are not
 blocking JavaScript from *viewscreen.githubusercontent.com*.
@@ -61,6 +60,8 @@ Given that:
 2. Details about the mapping between cluster usernames and anonymized SSO user
    IDs can be found on the *host* clusters in the form of *UserSignup*
    resources
+3. Details about the mapping between namespace names and owner usernames can
+   be found in annotations on the namespace resources on the *member* cluster.
 
 We can send details about the users' activity as seen via the cluster API
 server by doing the following on a periodic basis:
@@ -141,7 +142,7 @@ following logic on an hourly basis:
    actual Segment batch call records.
 3. Split the stream of records into ~500KB chunks
 4. Send each chunk to Segment via a batch call. Attempt this up to 3 times.
-  
+
 Since the logic will run on an hourly basis but will query the events from the
 last 4 hours, it will automatically attempt to send each event up to 4 times
 (Not including retries for failed API calls). Monitoring logic around the
