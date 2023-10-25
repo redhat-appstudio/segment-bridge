@@ -115,6 +115,7 @@ jq \
   | {
       messageId,
       timestamp,
+      namespace,
       type,
       userId: $ssoId,
       event: (.event // "\($evsm[0][.event_subject] // .event_subject) \($evvm[0][.event_verb] // .event_verb)"),

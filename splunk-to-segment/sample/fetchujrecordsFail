@@ -1,0 +1,1 @@
+{"preview":true,"offset":1,"lastrow":false,"result":{"context":"{}","event_subject":"applications","event_verb":"","messageId":"","namespace":"user1-tenant","properties":"{\"apiGroup\":\"different.com\",\"apiVersion\":\"v2beta\",\"kind\":\"other_applications\",\"name\":\"different-name\"}","timestamp":"","type":"track","userId":"user1"}}
