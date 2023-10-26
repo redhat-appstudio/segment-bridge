@@ -1,4 +1,13 @@
 # See the OWNERS docs: https://go.k8s.io/owners
+reviewers:
+- "ifireball"
+- "omeramsc"
+- "amisstea"
+- "Kousalya1998"
+- "srivickynesh"
+- "hmariset"
+- "ShakedAviv50313"
+- "yftacherzog"
 
 approvers:
 - ifireball
