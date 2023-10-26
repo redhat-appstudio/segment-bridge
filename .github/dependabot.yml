@@ -1,14 +1,3 @@
-reviewers-common: &reviewers-common
-  reviewers:
-    - "ifireball"
-    - "omeramsc"
-    - "amisstea"
-    - "Kousalya1998"
-    - "srivickynesh"
-    - "hmariset"
-    - "ShakedAviv50313"
-    - "yftacherzog"
-
 version: 2
 updates:
   - package-ecosystem: "docker"
@@ -17,39 +6,33 @@ updates:
       interval: daily
     commit-message:
       prefix: "chore(Dependabot-docker): "
-    <<: *reviewers-common
   - package-ecosystem: "docker"
     directory: "/splunk/"
     schedule:
       interval: daily
     commit-message:
       prefix: "chore(Dependabot-docker): "
-    <<: *reviewers-common
   - package-ecosystem: "docker"
     directory: "/kwok/"
     schedule:
       interval: daily
     commit-message:
       prefix: "chore(Dependabot-docker): "
-    <<: *reviewers-common
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
     commit-message:
       prefix: "chore(Dependabot-actions): "
-    <<: *reviewers-common
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
       interval: daily
     commit-message:
       prefix: "chore(Dependabot-go): "
-    <<: *reviewers-common
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: daily
     commit-message:
       prefix: "chore(Dependabot-pip): "
-    <<: *reviewers-common
