@@ -7,12 +7,10 @@ import "fmt"
 // GenApplicationQuery returns a Splunk query for generating Segment events
 // representing AppStudio Application object events.
 func GenApplicationQuery(index string) string {
-	q, _ := NewUserJourneyQuery(index).
+	q, _ := NewUserJourneyQuery(index, K8sApiId{"appstudio.redhat.com","applications"}).
 		WithPredicate(
 			`verb=create `+
 				`"responseStatus.code" IN (200, 201) `+
-				`"objectRef.apiGroup"="appstudio.redhat.com" `+
-				`"objectRef.resource"="applications" `+
 				`("impersonatedUser.username"="*" OR (user.username="*" AND NOT user.username="system:*")) `+
 				`(verb!=create OR "responseObject.metadata.resourceVersion"="*")`,
 		).
@@ -24,12 +22,10 @@ func GenApplicationQuery(index string) string {
 // GenComponentQuery returns a Splunk query for generating Segment events
 // representing AppStudio Component object events.
 func GenComponentQuery(index string) string {
-	q, _ := NewUserJourneyQuery(index).
+	q, _ := NewUserJourneyQuery(index, K8sApiId{"appstudio.redhat.com","components"}).
 		WithPredicate(
 			`verb IN (create, update, delete, patch) `+
 				`"responseStatus.code" IN (200, 201) `+
-				`"objectRef.apiGroup"="appstudio.redhat.com" `+
-				`"objectRef.resource"="components" `+
 				`("impersonatedUser.username"="*" OR (user.username="*" AND NOT user.username="system:*")) `+
 				`(verb!=create OR "responseObject.metadata.resourceVersion"="*")`,
 		).
@@ -41,12 +37,10 @@ func GenComponentQuery(index string) string {
 // GenBuildPipelineRunCreatedQuery returns a Splunk query for generating Segment events
 // representing creation of AppStudio build PipelineRuns.
 func GenBuildPipelineRunCreatedQuery(index string) string {
-	q, _ := NewUserJourneyQuery(index).
+	q, _ := NewUserJourneyQuery(index, K8sApiId{"tekton.dev","pipelineruns"}).
 		WithPredicate(
 			`verb=create `+
 				`"responseStatus.code" IN (200, 201) `+
-				`"objectRef.apiGroup"="tekton.dev" `+
-				`"objectRef.resource"="pipelineruns" `+
 				`"responseObject.metadata.labels.pipelines.appstudio.openshift.io/type"=build `+
 				`"responseObject.metadata.resourceVersion"="*"`,
 		).
@@ -64,12 +58,10 @@ func GenBuildPipelineRunStartedQuery(index string) string {
 	statusFilter.opts.reasons = []string{"Running"}
 	statusFilter.opts.message = "Tasks Completed: 0 %"
 
-	q, _ := NewUserJourneyQuery(index).
+	q, _ := NewUserJourneyQuery(index, K8sApiId{"tekton.dev","pipelineruns"}).
 		WithPredicate(
 			`verb=update `+
 				`"responseStatus.code"=200 `+
-				`"objectRef.apiGroup"="tekton.dev" `+
-				`"objectRef.resource"="pipelineruns" `+
 				`"objectRef.subresource"="status" `+
 				`"responseObject.metadata.labels.pipelines.appstudio.openshift.io/type"=build `+
 				`"responseObject.metadata.resourceVersion"="*" `+
@@ -92,12 +84,10 @@ func GenClairScanCompletedQuery(index string) string {
 
 	trFilter := NewTektonTaskResultFilter("CLAIR_SCAN_RESULT")
 
-	q, _ := NewUserJourneyQuery(index).
+	q, _ := NewUserJourneyQuery(index, K8sApiId{"tekton.dev","taskruns"}).
 		WithPredicate(
 			`verb=update `+
 				`"responseStatus.code"=200 `+
-				`"objectRef.apiGroup"="tekton.dev" `+
-				`"objectRef.resource"="taskruns" `+
 				`"objectRef.subresource"="status" `+
 				`"requestObject.metadata.labels.tekton.dev/pipelineTask"="clair-scan" `+
 				`"responseObject.status.completionTime"="*"`,
@@ -127,12 +117,10 @@ func GenBuildPipelineRunCompletedQuery(index string) string {
 	statusFilter := NewStatusConditionFilter("Succeeded")
 	statusFilter.opts.reasons = []string{"Completed", "Failed"}
 
-	q, _ := NewUserJourneyQuery(index).
+	q, _ := NewUserJourneyQuery(index, K8sApiId{"tekton.dev","pipelineruns"}).
 		WithPredicate(
 			`verb=update `+
 				`"responseStatus.code"=200 `+
-				`"objectRef.apiGroup"="tekton.dev" `+
-				`"objectRef.resource"="pipelineruns" `+
 				`"objectRef.subresource"="status" `+
 				`"responseObject.metadata.labels.pipelines.appstudio.openshift.io/type"=build `+
 				`"responseObject.metadata.resourceVersion"="*" `+
@@ -157,12 +145,10 @@ func GenReleaseCompletedQuery(index string) string {
 	statusFilter := NewStatusConditionFilter("Released")
 	statusFilter.opts.reasons = []string{"Succeeded", "Failed"}
 
-	q, _ := NewUserJourneyQuery(index).
+	q, _ := NewUserJourneyQuery(index, K8sApiId{"appstudio.redhat.com","releases"}).
 		WithPredicate(
 			`verb=patch `+
 				`"responseStatus.code"=200 `+
-				`"objectRef.apiGroup"="appstudio.redhat.com" `+
-				`"objectRef.resource"="releases" `+
 				`"objectRef.subresource"="status" `+
 				`"responseObject.metadata.resourceVersion"="*" `+
 				`"responseObject.status.completionTime"="*"`,
@@ -177,12 +163,10 @@ func GenReleaseCompletedQuery(index string) string {
 // GenPullRequestCreatedQuery returns a Splunk query for generating Segment events
 // whenever a Pull request is created in the users GitHub repository.
 func GenPullRequestCreatedQuery(index string) string {
-	q, _ := NewUserJourneyQuery(index).
+	q, _ := NewUserJourneyQuery(index, K8sApiId{"appstudio.redhat.com","components"}).
 		WithPredicate(
 			`verb=update `+
 				`"responseStatus.code"=200 `+
-				`"objectRef.apiGroup"="appstudio.redhat.com" `+
-				`"objectRef.resource"="components" `+
 				`"user.username"="system:serviceaccount:build-service:build-service-controller-manager" `+
 				`"responseObject.metadata.annotations.build.appstudio.openshift.io/status"="*pac*" `+
 				`(NOT "responseObject.metadata.annotations.build.appstudio.openshift.io/request"="*")`,
