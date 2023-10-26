@@ -1,4 +1,4 @@
-FROM registry.k8s.io/kwok/cluster:v0.3.0-k8s.v1.27.3
+FROM registry.k8s.io/kwok/cluster:v0.4.0-k8s.v1.27.3
 
 ARG CLUSTER_NAME=kwok
 ENV CLUSTER_NAME=${CLUSTER_NAME}
