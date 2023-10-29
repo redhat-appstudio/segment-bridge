@@ -1,5 +1,5 @@
 ---
-name: Pre-commit
+name: checks on Pull Request
 "on":
   push:
     branches:
@@ -23,7 +23,18 @@ jobs:
         run: pip install -r requirements.lock
       - name: Run pre-commit
         run: pre-commit run --all-files
-      - name: Run gitlint on the latest commit message
+  gitlint:
+    name: Run gitlint checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Install Python dependencies
+        run: pip install -r requirements.lock
+      - name: Run gitlint on CI with pre-commit
         run: >-
-          pre-commit run gitlint --hook-stage commit-msg --commit-msg-filename
-          .git/COMMIT_EDITMSG
+          gitlint --commits origin/${{ github.event.pull_request.base.ref
+          }}..HEAD
