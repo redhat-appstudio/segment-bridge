@@ -15,3 +15,7 @@ repos:
         stages: [commit-msg]
     repo: https://github.com/jorisroovers/gitlint
     rev: v0.18.0
+  - hooks:
+      - id: go-mod-tidy
+    repo: https://github.com/dnephin/pre-commit-golang
+    rev: v0.5.1
