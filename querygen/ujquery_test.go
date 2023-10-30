@@ -20,7 +20,7 @@ func (f *TestFilter) Commands() []string {
 }
 
 func TestUserJourneyQuery(t *testing.T) {
-	q, err := NewUserJourneyQuery("idx", K8sApiId{"api1.com","objects"}).
+	q, err := NewUserJourneyQuery("idx", K8sApiId{"api1.com", "objects"}).
 		WithPredicate("verb=created").
 		WithEventExpr(`"Event Name"`).
 		WithCommands(`eval foo="bar"`).
@@ -29,8 +29,8 @@ func TestUserJourneyQuery(t *testing.T) {
 		String()
 	assert.Nil(t, err)
 	assert.Equal(t,
-		`search index="idx" log_type=audit ` +
-			`"objectRef.apiGroup"="api1.com" "objectRef.resource"="objects" ` +
+		`search index="idx" log_type=audit `+
+			`"objectRef.apiGroup"="api1.com" "objectRef.resource"="objects" `+
 			`verb=created `+
 			`| eval foo="bar" `+
 			`| eval tf1="hello" `+
@@ -61,6 +61,6 @@ func TestUserJourneyQuery(t *testing.T) {
 }
 
 func TestUserJourneyQueryUnknownField(t *testing.T) {
-	_, err := NewUserJourneyQuery("idx", K8sApiId{"api1.com","objects"}).WithFields("not-found").String()
+	_, err := NewUserJourneyQuery("idx", K8sApiId{"api1.com", "objects"}).WithFields("not-found").String()
 	assert.NotNil(t, err)
 }

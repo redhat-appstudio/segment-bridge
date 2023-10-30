@@ -12,9 +12,9 @@ import (
 
 func TestTraceRequestsFrom(t *testing.T) {
 	tests := []struct {
-		name         string
+		name      string
 		test_func func(url string, c *http.Client)
-		want []RequestTrace
+		want      []RequestTrace
 	}{
 		{
 			name: "Single GET",

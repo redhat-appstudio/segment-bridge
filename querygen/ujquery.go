@@ -82,11 +82,11 @@ var UJFieldSet = K8sAuditFieldSet{
 			srcFields: []string{"build_status.pac.merge-url"},
 		},
 	},
-	K8sApiId{"appstudio.redhat.com","applications"}: {
+	K8sApiId{"appstudio.redhat.com", "applications"}: {
 		"application": {subObj: "properties", srcFields: []string{"objectRef.name"}},
 	},
-	K8sApiId{"appstudio.redhat.com","components"}: {
-		"event_verb":    {
+	K8sApiId{"appstudio.redhat.com", "components"}: {
+		"event_verb": {
 			srcExpr: `case(
 				'objectRef.resource'=="components"
 				AND verb=="patch"
@@ -101,9 +101,9 @@ var UJFieldSet = K8sAuditFieldSet{
 				)`,
 		},
 	},
-	K8sApiId{"appstudio.redhat.com","releases"}: {
+	K8sApiId{"appstudio.redhat.com", "releases"}: {
 		"application": {
-			subObj: "properties",
+			subObj:  "properties",
 			srcExpr: `mvindex('responseObject.metadata.ownerReferences{}.name',0)`,
 		},
 	},
@@ -134,7 +134,7 @@ type UserJourneyQuery struct {
 // NewUserJourneyQuery constructs a default UserJourneyQuery
 func NewUserJourneyQuery(index string, subject K8sApiId) *UserJourneyQuery {
 	return &UserJourneyQuery{
-		index: index,
+		index:   index,
 		subject: subject,
 		fields: []string{
 			"apiGroup",

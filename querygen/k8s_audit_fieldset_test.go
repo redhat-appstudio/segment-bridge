@@ -9,8 +9,8 @@ import (
 func TestK8sAuditFieldSet_QueryGen(t *testing.T) {
 	kfs := K8sAuditFieldSet{
 		K8sApiId{}: {
-			"plain_field":  {},
-			"override_field": {},
+			"plain_field":     {},
+			"override_field":  {},
 			"override_field2": {},
 		},
 		K8sApiId{"api1.com", "SomeObj"}: {
@@ -23,7 +23,7 @@ func TestK8sAuditFieldSet_QueryGen(t *testing.T) {
 		index      string
 		api        K8sApiId
 		searchExpr string
-		extra	   []FieldSet
+		extra      []FieldSet
 	}
 	tests := []struct {
 		name    string
@@ -34,12 +34,12 @@ func TestK8sAuditFieldSet_QueryGen(t *testing.T) {
 		{
 			name: "Simple query",
 			args: args{
-				index: "some_idx",
-				api: K8sApiId{"other.api.com", "SomeOtherObj"},
+				index:      "some_idx",
+				api:        K8sApiId{"other.api.com", "SomeOtherObj"},
 				searchExpr: "foo bar baz",
 			},
 			want: `search index="some_idx" log_type=audit ` +
-				`"objectRef.apiGroup"="other.api.com" `+
+				`"objectRef.apiGroup"="other.api.com" ` +
 				`"objectRef.resource"="SomeOtherObj" ` +
 				`foo bar baz` +
 				`|` + includeFieldsCmd +
@@ -48,12 +48,12 @@ func TestK8sAuditFieldSet_QueryGen(t *testing.T) {
 		{
 			name: "Query on customized object",
 			args: args{
-				index: "some_idx",
-				api: K8sApiId{"api1.com", "SomeObj"},
+				index:      "some_idx",
+				api:        K8sApiId{"api1.com", "SomeObj"},
 				searchExpr: "foo bar baz",
 			},
 			want: `search index="some_idx" log_type=audit ` +
-				`"objectRef.apiGroup"="api1.com" `+
+				`"objectRef.apiGroup"="api1.com" ` +
 				`"objectRef.resource"="SomeObj" ` +
 				`foo bar baz` +
 				`|eval override_field='other_field'` +
@@ -63,18 +63,18 @@ func TestK8sAuditFieldSet_QueryGen(t *testing.T) {
 		{
 			name: "Query with extra fields",
 			args: args{
-				index: "some_idx",
-				api: K8sApiId{"api1.com", "SomeObj"},
+				index:      "some_idx",
+				api:        K8sApiId{"api1.com", "SomeObj"},
 				searchExpr: "foo bar baz",
 				extra: []FieldSet{
 					{
 						"override_field2": {srcExpr: "foo()"},
-						"added_field": {},
+						"added_field":     {},
 					},
 				},
 			},
 			want: `search index="some_idx" log_type=audit ` +
-				`"objectRef.apiGroup"="api1.com" `+
+				`"objectRef.apiGroup"="api1.com" ` +
 				`"objectRef.resource"="SomeObj" ` +
 				`foo bar baz` +
 				`|eval override_field='other_field',override_field2=foo()` +

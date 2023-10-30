@@ -24,10 +24,10 @@ func (kfs K8sAuditFieldSet) QueryGen(
 	index string, api K8sApiId, searchExpr string, fields []string, extra ...FieldSet,
 ) (string, error) {
 	searchCmd := strings.TrimSpace(fmt.Sprintf(
-		`search index="%s" log_type=audit ` +
-		`"objectRef.apiGroup"="%s" ` +
-		`"objectRef.resource"="%s" ` +
-		`%s`,
+		`search index="%s" log_type=audit `+
+			`"objectRef.apiGroup"="%s" `+
+			`"objectRef.resource"="%s" `+
+			`%s`,
 		index,
 		api.apiGroup,
 		api.resource,

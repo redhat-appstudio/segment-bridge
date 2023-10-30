@@ -9,33 +9,33 @@ import (
 
 func TestIntSeries(t *testing.T) {
 	type results struct {
-		len uint
+		len                  uint
 		min, max, total, avg int
-		str string
+		str                  string
 	}
-	tests := []struct{
-		name string
+	tests := []struct {
+		name    string
 		samples []int
-		format string
-		want results
+		format  string
+		want    results
 	}{
 		{
-			name: "No samples",
+			name:    "No samples",
 			samples: []int{},
-			format: "%v",
-			want: results{str: "min: 0 max: 0 avg: 0"},
+			format:  "%v",
+			want:    results{str: "min: 0 max: 0 avg: 0"},
 		},
 		{
-			name: "3 samples",
+			name:    "3 samples",
 			samples: []int{2, 8, 8},
-			format: "Stats: %3d",
+			format:  "Stats: %3d",
 			want: results{
-				len: 3,
-				min: 2,
-				max: 8,
+				len:   3,
+				min:   2,
+				max:   8,
 				total: 18,
-				avg: 6,
-				str: "Stats: min:   2 max:   8 avg:   6",
+				avg:   6,
+				str:   "Stats: min:   2 max:   8 avg:   6",
 			},
 		},
 	}
