@@ -22,4 +22,4 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r requirements.lock
       - name: Run pre-commit
-        run: pre-commit run --all-files
+        run: pre-commit run --verbose --all-files
