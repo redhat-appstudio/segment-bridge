@@ -9,7 +9,7 @@ line-length=72
 
 [body-first-line-empty]
 
-# Dependabot tends to generate lines that exceed the default 80 char limit.
+# Bot users tends to generate invalid commits.
 [ignore-by-author-name]
-regex=dependabot
+regex=(dependabot|red-hat-trusted-app-pipeline)
 ignore=all
