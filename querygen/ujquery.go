@@ -82,6 +82,9 @@ var UJFieldSet = K8sAuditFieldSet{
 			srcFields: []string{"build_status.pac.merge-url"},
 		},
 	},
+	K8sApiId{"appstudio.redhat.com","applications"}: {
+		"application": {subObj: "properties", srcFields: []string{"objectRef.name"}},
+	},
 	K8sApiId{"appstudio.redhat.com","components"}: {
 		"event_verb":    {
 			srcExpr: `case(
@@ -96,6 +99,12 @@ var UJFieldSet = K8sAuditFieldSet{
 				true(),
 				'verb'
 				)`,
+		},
+	},
+	K8sApiId{"appstudio.redhat.com","releases"}: {
+		"application": {
+			subObj: "properties",
+			srcExpr: `mvindex('responseObject.metadata.ownerReferences{}.name',0)`,
 		},
 	},
 }
