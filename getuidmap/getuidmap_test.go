@@ -1,20 +1,48 @@
-package kwok
+package getuidmap
 
 import (
 	_ "embed"
+	"os/exec"
 	"testing"
 
 	"github.com/redhat-appstudio/segment-bridge.git/containerfixture"
+	"github.com/redhat-appstudio/segment-bridge.git/kwokfixture"
+	"github.com/redhat-appstudio/segment-bridge.git/testfixture"
 	"github.com/stretchr/testify/assert"
 )
 
 //go:embed kwok_container_template.tmpl
 var kwokServiceManifest string
 
+const scriptPath = "../scripts/get-uid-map.sh"
+
+type ShellScriptExecutor struct{}
+
+func (s *ShellScriptExecutor) Execute(scriptPath string) ([]byte, error) {
+	return exec.Command("/bin/sh", scriptPath).CombinedOutput()
+}
+
+func validateMap(m map[string]int64) bool {
+	if len(m) == 0 {
+		return false
+	}
+
+	for user := range m {
+		if user == "<no value>" || user == "" {
+			return false
+		}
+	}
+	return true
+}
+
 func TestGetUIDMap(t *testing.T) {
 	containerfixture.WithServiceContainer(t, kwokServiceManifest, func(deployment containerfixture.FixtureInfo) {
-		m, err := setUpClusterConfiguration()
+		err := kwokfixture.SetUpClusterConfiguration()
 		assert.NoError(t, err, "Failed to set up cluster configuration")
+
+		executor := &ShellScriptExecutor{}
+		m, err := testfixture.ExecuteAndParseScript(executor, scriptPath)
+		assert.NoError(t, err, "ExecuteAndParseScript() should not return an error")
 
 		testCases := []struct {
 			name   string

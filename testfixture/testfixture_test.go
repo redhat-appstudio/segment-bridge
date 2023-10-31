@@ -1,9 +1,22 @@
 package testfixture
 
 import (
+	"fmt"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
+
+type MockExecutor struct {
+	mock.Mock
+}
+
+func (m *MockExecutor) Execute(scriptPath string) ([]byte, error) {
+	args := m.Called(scriptPath)
+	return args.Get(0).([]byte), args.Error(1)
+}
 
 func createTempFile(t *testing.T, content string) string {
 	t.Helper()
@@ -77,5 +90,31 @@ func TestRunScriptWithInputFile(t *testing.T) {
 		if _, err := RunScriptWithInputFile("/tmp/ewefewg34234", scriptFilePath); err == nil {
 			t.Errorf("Expected an error, got none")
 		}
+	})
+}
+
+func TestExecuteAndParseScript(t *testing.T) {
+	executor := new(MockExecutor)
+
+	t.Run("Successful Execution", func(t *testing.T) {
+		executor.On("Execute", "valid_script.sh").Return([]byte(`{"key": 123}`), nil)
+		result, err := ExecuteAndParseScript(executor, "valid_script.sh")
+		assert.NoError(t, err)
+		assert.Equal(t, map[string]int64{"key": 123}, result)
+		executor.AssertExpectations(t)
+	})
+
+	t.Run("Execution Failure", func(t *testing.T) {
+		executor.On("Execute", "invalid_script.sh").Return([]byte{}, fmt.Errorf("execution failed"))
+		_, err := ExecuteAndParseScript(executor, "invalid_script.sh")
+		assert.Error(t, err)
+		executor.AssertExpectations(t)
+	})
+
+	t.Run("JSON Parsing Failure", func(t *testing.T) {
+		executor.On("Execute", "invalid_json.sh").Return([]byte("invalid json"), nil)
+		_, err := ExecuteAndParseScript(executor, "invalid_json.sh")
+		assert.Error(t, err)
+		executor.AssertExpectations(t)
 	})
 }
