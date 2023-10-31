@@ -14,7 +14,7 @@ func GenApplicationQuery(index string) string {
 				`("impersonatedUser.username"="*" OR (user.username="*" AND NOT user.username="system:*")) `+
 				`(verb!=create OR "responseObject.metadata.resourceVersion"="*")`,
 		).
-		WithFields("name", "userId").
+		WithFields("name", "userId", "application").
 		String()
 	return q
 }
@@ -155,7 +155,7 @@ func GenReleaseCompletedQuery(index string) string {
 		).
 		WithFilter(statusFilter).
 		WithEventExpr(`"Release process done"`).
-		WithFields("name", "status_reason", "status_message").
+		WithFields("name", "application", "status_reason", "status_message").
 		String()
 	return q
 }
