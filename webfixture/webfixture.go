@@ -10,7 +10,7 @@ import (
 
 // RequestTrace represents simple data about a web request
 type RequestTrace struct {
-	Method,	Path, Body string
+	Method, Path, Body string
 }
 
 // TraceRequestsFrom runs a small web server, and then invokes a provided test

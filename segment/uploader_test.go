@@ -23,11 +23,11 @@ import (
 type testRecord map[string]string
 
 type testCase struct {
-	name string
-	data []testRecord
+	name         string
+	data         []testRecord
 	dataJsonSize int
 	maxBatchSize int
-	shouldSplit bool
+	shouldSplit  bool
 }
 
 // Structure of a Segment batch record - for decoding JSON
@@ -65,7 +65,7 @@ func TestUploader(t *testing.T) {
 				requireJSONDecode(
 					t, request.Body, &reqData,
 					"Failed to decode sent request JSON. "+
-					"Perhaps not sent with the right structure?",
+						"Perhaps not sent with the right structure?",
 				)
 
 				requestRecords += len(reqData.Batch)
@@ -119,8 +119,8 @@ func mkTestCases(t *testing.T) (cases []testCase) {
 			return true
 		}
 		cases = append(cases, testCase{
-			name: fmt.Sprintf("records-%d-bytes-%d", len(data), len(jsonData)),
-			data: data,
+			name:         fmt.Sprintf("records-%d-bytes-%d", len(data), len(jsonData)),
+			data:         data,
 			dataJsonSize: len(jsonData),
 		})
 		records.Add(len(data))

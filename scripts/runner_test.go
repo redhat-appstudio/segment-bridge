@@ -12,7 +12,7 @@ import (
 func TestLookPath(t *testing.T) {
 	tests := []struct {
 		scriptFile string
-		wantErr bool
+		wantErr    bool
 	}{
 		{"no-such-file", true},
 		{"fetch-uj-records.sh", false},
@@ -34,7 +34,7 @@ func TestLookPath(t *testing.T) {
 			filNfo, err := os.Stat(got)
 			require.NoError(err, "stat() call on result failed with: %v", err)
 			assert.True(filNfo.Mode().IsRegular(), "result must be a regular file")
-			assert.NotEqual(0, filNfo.Mode() & 0444, "result must be executable")
+			assert.NotEqual(0, filNfo.Mode()&0444, "result must be executable")
 			t.Logf("LookPath() = %v", got)
 		})
 	}

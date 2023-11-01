@@ -7,7 +7,7 @@ import "fmt"
 // GenApplicationQuery returns a Splunk query for generating Segment events
 // representing AppStudio Application object events.
 func GenApplicationQuery(index string) string {
-	q, _ := NewUserJourneyQuery(index, K8sApiId{"appstudio.redhat.com","applications"}).
+	q, _ := NewUserJourneyQuery(index, K8sApiId{"appstudio.redhat.com", "applications"}).
 		WithPredicate(
 			`verb=create `+
 				`"responseStatus.code" IN (200, 201) `+
@@ -22,7 +22,7 @@ func GenApplicationQuery(index string) string {
 // GenComponentQuery returns a Splunk query for generating Segment events
 // representing AppStudio Component object events.
 func GenComponentQuery(index string) string {
-	q, _ := NewUserJourneyQuery(index, K8sApiId{"appstudio.redhat.com","components"}).
+	q, _ := NewUserJourneyQuery(index, K8sApiId{"appstudio.redhat.com", "components"}).
 		WithPredicate(
 			`verb IN (create, update, delete, patch) `+
 				`"responseStatus.code" IN (200, 201) `+
@@ -37,7 +37,7 @@ func GenComponentQuery(index string) string {
 // GenBuildPipelineRunCreatedQuery returns a Splunk query for generating Segment events
 // representing creation of AppStudio build PipelineRuns.
 func GenBuildPipelineRunCreatedQuery(index string) string {
-	q, _ := NewUserJourneyQuery(index, K8sApiId{"tekton.dev","pipelineruns"}).
+	q, _ := NewUserJourneyQuery(index, K8sApiId{"tekton.dev", "pipelineruns"}).
 		WithPredicate(
 			`verb=create `+
 				`"responseStatus.code" IN (200, 201) `+
@@ -58,7 +58,7 @@ func GenBuildPipelineRunStartedQuery(index string) string {
 	statusFilter.opts.reasons = []string{"Running"}
 	statusFilter.opts.message = "Tasks Completed: 0 %"
 
-	q, _ := NewUserJourneyQuery(index, K8sApiId{"tekton.dev","pipelineruns"}).
+	q, _ := NewUserJourneyQuery(index, K8sApiId{"tekton.dev", "pipelineruns"}).
 		WithPredicate(
 			`verb=update `+
 				`"responseStatus.code"=200 `+
@@ -84,7 +84,7 @@ func GenClairScanCompletedQuery(index string) string {
 
 	trFilter := NewTektonTaskResultFilter("CLAIR_SCAN_RESULT")
 
-	q, _ := NewUserJourneyQuery(index, K8sApiId{"tekton.dev","taskruns"}).
+	q, _ := NewUserJourneyQuery(index, K8sApiId{"tekton.dev", "taskruns"}).
 		WithPredicate(
 			`verb=update `+
 				`"responseStatus.code"=200 `+
@@ -117,7 +117,7 @@ func GenBuildPipelineRunCompletedQuery(index string) string {
 	statusFilter := NewStatusConditionFilter("Succeeded")
 	statusFilter.opts.reasons = []string{"Completed", "Failed"}
 
-	q, _ := NewUserJourneyQuery(index, K8sApiId{"tekton.dev","pipelineruns"}).
+	q, _ := NewUserJourneyQuery(index, K8sApiId{"tekton.dev", "pipelineruns"}).
 		WithPredicate(
 			`verb=update `+
 				`"responseStatus.code"=200 `+
@@ -133,7 +133,7 @@ func GenBuildPipelineRunCompletedQuery(index string) string {
 			"status_message", "status_reason",
 			"repo", "commit_sha", "target_branch",
 			"git_trigger_event_type", "git_trigger_provider",
-			 "pipeline_log_url").
+			"pipeline_log_url").
 		String()
 
 	return q
@@ -145,7 +145,7 @@ func GenReleaseCompletedQuery(index string) string {
 	statusFilter := NewStatusConditionFilter("Released")
 	statusFilter.opts.reasons = []string{"Succeeded", "Failed"}
 
-	q, _ := NewUserJourneyQuery(index, K8sApiId{"appstudio.redhat.com","releases"}).
+	q, _ := NewUserJourneyQuery(index, K8sApiId{"appstudio.redhat.com", "releases"}).
 		WithPredicate(
 			`verb=patch `+
 				`"responseStatus.code"=200 `+
@@ -163,7 +163,7 @@ func GenReleaseCompletedQuery(index string) string {
 // GenPullRequestCreatedQuery returns a Splunk query for generating Segment events
 // whenever a Pull request is created in the users GitHub repository.
 func GenPullRequestCreatedQuery(index string) string {
-	q, _ := NewUserJourneyQuery(index, K8sApiId{"appstudio.redhat.com","components"}).
+	q, _ := NewUserJourneyQuery(index, K8sApiId{"appstudio.redhat.com", "components"}).
 		WithPredicate(
 			`verb=update `+
 				`"responseStatus.code"=200 `+

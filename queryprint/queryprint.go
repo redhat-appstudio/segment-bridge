@@ -33,7 +33,7 @@ func prettyPrintQuery(query string, indent string) string {
 		builder.WriteString(indent)
 		builder.WriteString(query)
 	} else {
-		for i, line := range(strings.Split(query, "|")) {
+		for i, line := range strings.Split(query, "|") {
 			if i > 0 {
 				builder.WriteString("\n")
 			}

@@ -77,9 +77,9 @@ func TestPrettyPrintQueries(t *testing.T) {
 
 func TestMachinePrintQueries(t *testing.T) {
 	tests := []struct {
-		name string
+		name    string
 		queries []QueryDesc
-		want string
+		want    string
 	}{
 		{
 			name:    "With no queries",
@@ -107,9 +107,9 @@ func TestMachinePrintQueries(t *testing.T) {
 					`|fields fields,shown,in,results`,
 			}},
 			want: `search index=some_long_index_name log_type=awesome match=value` +
-			`|eval custom_field=some_expression,` +
-			`other_field=other_expression` +
-			`|fields fields,shown,in,results`,
+				`|eval custom_field=some_expression,` +
+				`other_field=other_expression` +
+				`|fields fields,shown,in,results`,
 		},
 	}
 	for _, tt := range tests {
