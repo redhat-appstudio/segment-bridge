@@ -5,9 +5,14 @@ endpoint="https://localhost:8089/services/data/inputs/oneshot"
 SPLUNK_PASSWORD="Password"
 
 echo "Indexing logs..."
+max_retries=3
+
 for file in "$logs_path"/*; do
   echo "Indexing $file"
-  curl  --insecure --user admin:"$SPLUNK_PASSWORD" "$endpoint" --data name="$file" --data index="test_index"
+  if ! curl --insecure --user admin:"$SPLUNK_PASSWORD" --retry $max_retries --retry-max-time 60 "$endpoint" --data name="$file" --data index="test_index"; then
+    echo "Encountered an error while initiating indexing for $file. Max retry attempts reached. Exiting."
+    exit 1
+  fi
 done
 
 timeout_start=$(date +%s)
