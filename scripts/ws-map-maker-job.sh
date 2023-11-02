@@ -11,6 +11,7 @@
 #
 set -o pipefail -o errexit -o nounset -o xtrace
 
-oc create configmap --dry-run=client -o yaml ws-map \
-  --from-file=ws-map.json=<(KUBECONFIG="$KUBECONFIG_SRC" get-workspace-map.sh) \
-| oc apply -f -
+if ! oc create configmap --dry-run=client -o yaml ws-map \
+  --from-file=ws-map.json=<(KUBECONFIG="$KUBECONFIG_SRC" get-workspace-map.sh) | oc apply -f -; then
+  echo "Error: Encountered an issue while applying the ConfigMap."
+fi
