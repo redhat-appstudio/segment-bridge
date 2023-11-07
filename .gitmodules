@@ -1,0 +1,3 @@
+[submodule "kwok/host-operator"]
+	path = kwok/host-operator
+	url = https://github.com/codeready-toolchain/host-operator.git
