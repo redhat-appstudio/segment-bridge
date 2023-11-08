@@ -1,0 +1,35 @@
+---
+name: Unit tests
+"on":
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+jobs:
+  go-test:
+    runs-on: ubuntu-latest
+    container:
+      image: registry.access.redhat.com/ubi8/go-toolset:1.19.13-2.1698062273
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Cache jq
+        id: cache-jq
+        uses: actions/cache@v3
+        with:
+          path: ~/packages
+          key: jq-1.7-${{ runner.os }}
+        if: success()
+      - if: ${{ steps.cache-jq.outputs.cache-hit != 'true' }}
+        name: Install jq
+        run: |
+          mkdir -p ~/packages && \
+          curl -L \
+          https://github.com/stedolan/jq/releases/download/jq-1.7/jq-linux64 \
+          -o ~/packages/jq && \
+          chmod +x ~/packages/jq
+      - name: Run GO tests
+        run: |
+          export PATH=~/packages:$PATH && \
+          go test -short -v $(go list ./... | grep -v '/splunk\|/kwok')
