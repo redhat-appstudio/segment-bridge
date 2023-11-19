@@ -1,5 +1,5 @@
 ---
-name: gitlint checks on Pull Request
+name: checks on Pull Request
 "on":
   pull_request:
     types:
@@ -22,3 +22,15 @@ jobs:
         run: >-
           gitlint --commits origin/${{ github.event.pull_request.base.ref
           }}..HEAD
+  check-same-go-toolset:
+    name: Check the same Go Toolset image is used everywhere
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Run check-same-go-toolset script
+        run: >-
+          bash chore-scripts/check-same-go-toolset.sh
