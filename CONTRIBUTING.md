@@ -17,6 +17,11 @@ Kubernetes Without Kubelet. Kwok simply simulates the node's behaviour.
 As a result, it can mimic a high number of nodes and pods while consuming
 only a small amount of memory.
 
+Run the following command for a fresh clone to initialize and update the submodule:
+   ```
+   git submodule update --init
+   ```
+
 To run the Kwok container with the Kwok Kubernetes tool, follow these steps:
 
 1. Build the kwok container using the following command:
@@ -137,8 +142,9 @@ _tests.go and with .go.
 
 #### Running the Unit Tests Locally
 1. Clone your fork of the project.
-2. Navigate to the project's root directory
-3. To run all the Go unit tests in the repository,
+2. Initialise [git-submodules](#Running-a-test-environment) before running the unit tests. 
+3. Navigate to the project's root directory
+4. To run all the Go unit tests in the repository,
 execute the following command `go clean -testcache && go test ./...`
 a similar output is expected:
 
