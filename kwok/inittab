@@ -1,0 +1,2 @@
+::wait:/usr/local/bin/kwokctl start cluster --name kwok
+::respawn:/usr/local/bin/kwokctl --name kwok kubectl proxy --port=8080 --accept-hosts='^*$' --address=0.0.0.0
