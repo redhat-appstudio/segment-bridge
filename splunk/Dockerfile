@@ -1,4 +1,4 @@
-FROM docker.io/splunk/splunk@sha256:20b1376a1677ef6eff611b1d1e25e3a170a715c646c2c27711bbb65b03f78ede AS builder
+FROM docker.io/splunk/splunk@sha256:7eca42b8a7a777053e1d0420287a683167ed228ab09444b35b3f4a8f54cb6cd4 AS builder
 
 ENV SPLUNK_START_ARGS=--accept-license
 
@@ -17,7 +17,7 @@ RUN microdnf install -y jq --disablerepo="*" --enablerepo="ubi-8-appstream-rpms"
 USER ansible
 RUN bash -o errexit /opt/splunk/pre-run.sh
 
-FROM docker.io/splunk/splunk@sha256:20b1376a1677ef6eff611b1d1e25e3a170a715c646c2c27711bbb65b03f78ede
+FROM docker.io/splunk/splunk@sha256:7eca42b8a7a777053e1d0420287a683167ed228ab09444b35b3f4a8f54cb6cd4
 
 ENV SPLUNK_START_ARGS=--accept-license
 
