@@ -21,9 +21,9 @@ To run the Kwok container with the Kwok Kubernetes tool, follow these steps:
 
 1. Build the kwok container using the following command:
    ```
-   podman build --build-arg CLUSTER_NAME=kwok-cluster -t kwok -f kwok/Dockerfile .
+   podman build -t kwok -f kwok/Dockerfile kwok
    ```
-2. Bring the cluster up by running the following command from the 
+2. Bring the clusters up by running the following command from the 
    repo's root directory:
     ```
     podman kube play kwok/kwok_container_default.yml
@@ -32,25 +32,29 @@ To run the Kwok container with the Kwok Kubernetes tool, follow these steps:
 3. Check `podman pod list` should list the below pod
     ```
     POD ID        NAME            STATUS      CREATED        INFRA ID      # OF CONTAINERS
-    e815836efc86  kwok-container  Running     1 minutes ago  8466696a9956  2
+    e815836efc86  kwok-pod        Running     1 minutes ago  8466696a9956  2
     ```
 
-4. Once the Kwok cluster is up and running, set the cluster details in the
-   OpenShift client with the following command:
+4. Once the Kwok clusters are up and running, set the cluster details in the
+   OpenShift client with the following commands:
     ```
-    oc config set-cluster kwok --server=http://127.0.0.1:8080
+    oc config set-cluster kwok-host --server=http://127.0.0.1:8080
+    oc config set-cluster kwok-m01 --server=http://127.0.0.1:8070
+    oc config set-cluster kwok-rh01 --server=http://127.0.0.1:8060
     ```
 
-5. Create a new context (you only need to set the cluster once) for the Kwok
-   cluster with the following command:
+5. Create new contexts (you only need to set the contexts once) for the Kwok
+   clusters with the following commands:
     ```
-    oc config set-context kwok --cluster=kwok
+    oc config set-context kwok-host --cluster=kwok-host
+    oc config set-context kwok-m01 --cluster=kwok-m01
+    oc config set-context kwok-rh01 --cluster=kwok-rh01
     ```
 
 6. Set the Kwok context as the current context, if you've previously switched
    to another cluster, with the following command:
     ```
-    oc config use-context kwok
+    oc config use-context { kwok-host, kwok-m01, kwok-rh01 }
     ```
 
 Now you can access the cluster using kubectl, e.g.: `kubectl get ns`.
