@@ -14,6 +14,9 @@ RUN KWOK_KUBE_APISERVER_PORT=0 kwokctl create cluster --name "$HOST_CLUSTER" || 
     CLUSTER_NAME="$HOST_CLUSTER" sh ./user-signups.sh && \
     kwokctl --name="$MEMBER_CLUSTER" kubectl apply -f toolchain.dev.openshift.com_usersignups.yaml && \
     kwokctl --name="$RH_CLUSTER" kubectl apply -f toolchain.dev.openshift.com_usersignups.yaml && \
+    kwokctl --name "$HOST_CLUSTER" get kubeconfig > "/$HOST_CLUSTER" && \
+    kwokctl --name "$MEMBER_CLUSTER" get kubeconfig > "/$MEMBER_CLUSTER" && \
+    kwokctl --name "$RH_CLUSTER" get kubeconfig > "/$RH_CLUSTER" && \
     kwokctl stop cluster --name="$HOST_CLUSTER" && \
     kwokctl stop cluster --name="$MEMBER_CLUSTER" && \
     kwokctl stop cluster --name="$RH_CLUSTER" && \
