@@ -59,6 +59,13 @@ To run the Kwok container with the Kwok Kubernetes tool, follow these steps:
 
 Now you can access the cluster using kubectl, e.g.: `kubectl get ns`.
 
+> **Note**
+>
+> Alternatively, you can also use the kubeconfig file on the repository providing the
+> context and the cluster inline with the command. For example:
+>
+> ```oc --kubeconfig=./kwok/kubeconfig --context=kwok-host get ns```
+
 ### Setting up a containerized Splunk instance
 
 To set up a containerized Splunk instance, you can use either podman or docker.
