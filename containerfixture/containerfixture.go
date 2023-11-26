@@ -163,6 +163,8 @@ func WithServiceContainer(t *testing.T, ServiceManifest string, testFunc func(Fi
 	deployment := buildAndRunPod(t, ServiceManifest)
 
 	defer cleanup(t, deployment.PodName)
+
+	testFunc(deployment)
 	return
 }
 
