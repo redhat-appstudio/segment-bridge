@@ -8,6 +8,9 @@ import (
 	"path"
 	"path/filepath"
 	"runtime"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // A version of exec.LookPath that can find our scripts
@@ -45,4 +48,11 @@ func GetRepoRootDir() (string, error) {
 	}
 	dirPath := filepath.Dir(filepath.Dir(filename))
 	return dirPath, nil
+}
+
+func ExecuteScript(t *testing.T, scriptPath string) []byte {
+	cmd := exec.Command(scriptPath)
+	output, err := cmd.Output()
+	assert.NoError(t, err, "failed to run script")
+	return output
 }
