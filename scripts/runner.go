@@ -50,7 +50,7 @@ func GetRepoRootDir() (string, error) {
 	return dirPath, nil
 }
 
-func ExecuteScript(t *testing.T, scriptPath string) []byte {
+func AssertExecuteScript(t *testing.T, scriptPath string) []byte {
 	cmd := exec.Command(scriptPath)
 	output, err := cmd.Output()
 	assert.NoError(t, err, "failed to run script")

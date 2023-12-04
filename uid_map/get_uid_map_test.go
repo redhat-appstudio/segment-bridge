@@ -15,13 +15,13 @@ func TestGetUIDMap(t *testing.T) {
 	containerfixture.WithServiceContainer(t, kwok.KwokServiceManifest, func(deployment containerfixture.FixtureInfo) {
 		kwok.SetKubeconfig()
 		scriptPath := "../scripts/get-uid-map.sh"
-		output := scripts.ExecuteScript(t, scriptPath)
+		output := scripts.AssertExecuteScript(t, scriptPath)
 
 		var outputMap map[string]interface{}
 		err := json.Unmarshal(output, &outputMap)
 		assert.NoError(t, err, "failed to parse json")
 
-		testCases := []struct {
+		assertions := []struct {
 			name   string
 			input  map[string]interface{}
 			expect bool
@@ -33,9 +33,9 @@ func TestGetUIDMap(t *testing.T) {
 			{"empty map", map[string]interface{}{}, false},
 		}
 
-		for _, tc := range testCases {
-			t.Run(tc.name, func(t *testing.T) {
-				assert.Equal(t, tc.expect, validateUIDMap(tc.input), "Test case: %s", tc.name)
+		for _, assertion := range assertions {
+			t.Run(assertion.name, func(t *testing.T) {
+				assert.Equal(t, assertion.expect, validateUIDMap(assertion.input), "Test case: %s", assertion.name)
 			})
 		}
 	})
