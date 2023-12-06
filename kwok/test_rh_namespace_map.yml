@@ -1,0 +1,24 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ieyasu-tenant
+  labels:
+    toolchain.dev.openshift.com/type: tenant
+    toolchain.dev.openshift.com/space: ieyasu
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nobu-tenant
+  labels:
+    toolchain.dev.openshift.com/type: tenant
+    toolchain.dev.openshift.com/space: nobu
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: irrelevant-namespace-tenant
+  labels:
+    toolchain.dev.openshift.com/type: not-tenant
+    toolchain.dev.openshift.com/space: orin-tenant

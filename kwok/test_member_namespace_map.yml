@@ -1,0 +1,37 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: date-masamune-tenant
+  labels:
+    toolchain.dev.openshift.com/type: tenant
+    toolchain.dev.openshift.com/space: date-masamune
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: koyasu-tenant
+  labels:
+    toolchain.dev.openshift.com/type: tenant
+    toolchain.dev.openshift.com/space: koyasu
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nobu-tenant
+  labels:
+    toolchain.dev.openshift.com/type: tenant
+    toolchain.dev.openshift.com/space: nobu
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: non-rhtap-namespace-with-labels-tenant
+  labels:
+    toolchain.dev.openshift.com/type: not_what_we_are_looking_for
+    toolchain.dev.openshift.com/space: non-rhtap-namespace-with-labels
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: no-labels-namespace
