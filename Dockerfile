@@ -5,7 +5,7 @@ COPY --chown=default:root . .
 RUN go build -o /opt/app-root/build/ ./cmd/...
 
 # Second stage: Create the final container image
-FROM registry.redhat.io/openshift4/ose-tools-rhel8:v4.13.0-202309181427.p0.g17b7acc.assembly.stream
+FROM registry.redhat.io/openshift4/ose-tools-rhel8:v4.13.0-202311211131.p0.gc7c6eb2.assembly.stream
 
 LABEL \
     description="Tooling for routing selected K8s API event to Segment" \
