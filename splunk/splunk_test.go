@@ -13,21 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-//go:embed splunk_container_template.tmpl
-var splunkServiceManifest string
 var countPattern = regexp.MustCompile(`(?m)^count\s+(\d+)$`)
-
-const NotUpErrorMsg = "The %s instance is not up, cannot verify indexing for tests."
-
-func withSplunkContainer(t *testing.T, testFunc func(containerfixture.FixtureInfo)) {
-	containerfixture.WithServiceContainer(
-		t, splunkServiceManifest,
-		func(fi containerfixture.FixtureInfo) {
-			endpoint := fmt.Sprintf("http://localhost:%s/%s", fi.ApiPort, ServiceStatusCheckPath)
-			containerfixture.RequireServiceIsUp(t, endpoint, NotUpErrorMsg, ServiceName)
-			testFunc(fi)
-		})
-}
 
 func getRecordsCount(splunkAppApiURL, index string) (string, error) {
 	SplunkAppSearchURL := GetSearchAPIEndpoint(splunkAppApiURL)
@@ -50,7 +36,7 @@ func getRecordsCount(splunkAppApiURL, index string) (string, error) {
 }
 
 func TestGetRecordsCount(t *testing.T) {
-	withSplunkContainer(t, func(deployment containerfixture.FixtureInfo) {
+	WithSplunkContainer(t, func(deployment containerfixture.FixtureInfo) {
 		splunkAppApiURL := GetSplunkAppAPIEndpoint("localhost", deployment.ApiPort, "nobody", "-")
 		tests := []struct {
 			name       string
