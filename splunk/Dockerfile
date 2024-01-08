@@ -8,6 +8,9 @@ COPY --chmod=777 tests/test_logs /opt/splunk/test_logs
 COPY --chmod=777 tests/indexes.conf /opt/splunk/etc/apps/search/local/indexes.conf
 COPY --chmod=777 scripts/log_indexing.sh /opt/splunk/log_indexing.sh
 COPY --chmod=777 scripts/pre-run.sh /opt/splunk/pre-run.sh
+COPY --chmod=777 props.conf /opt/splunk/etc/system/local/
+COPY --chmod=777 limits.conf /opt/splunk/etc/system/local/
+
 
 RUN microdnf install -y jq --disablerepo="*" --enablerepo="ubi-8-appstream-rpms" \
     && microdnf clean all \
