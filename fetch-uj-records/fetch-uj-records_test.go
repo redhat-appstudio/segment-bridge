@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	scriptPath   = "../scripts/fetch-uj-records.sh"
-	filePathPass = "./requiredOutput"
+	scriptPath      = "../scripts/fetch-uj-records.sh"
+	filePathSuccess = "./requiredOutput"
 )
 
 func compareOutputs(t *testing.T, output []byte, filePath string) bool {
@@ -48,7 +48,7 @@ func TestFetchUjRecords(t *testing.T) {
 		require.NoError(t, os.Setenv("CURL_NETRC", netrcPath), "Failed to set CURL_NETRC")
 		require.NoError(t, os.Setenv("SPLUNK_APP_API_URL", splunkAppApiURL), "Failed to set SPLUNK_API_URL")
 		t.Run("PassPath", func(t *testing.T) {
-			assert.True(t, runAndValidateScript(t, filePathPass, scriptPath), "Script validation failed for PassPath")
+			assert.True(t, runAndValidateScript(t, filePathSuccess, scriptPath), "Script validation failed for PassPath")
 		})
 	})
 }

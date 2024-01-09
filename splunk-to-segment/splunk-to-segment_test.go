@@ -11,9 +11,9 @@ import (
 )
 
 const (
-	scriptPath   = "../scripts/splunk-to-segment.sh"
-	filePathPass = "sample/fetchujrecordsPass"
-	filePathFail = "sample/fetchujrecordsFail"
+	scriptPath      = "../scripts/splunk-to-segment.sh"
+	filePathSuccess = "sample/fetchujrecordsPass"
+	filePathFail    = "sample/fetchujrecordsFail"
 )
 
 type ExpectedOutput struct {
@@ -67,7 +67,7 @@ func TestSplunkToSegment(t *testing.T) {
 	require.NoError(t, os.Setenv("WS_MAP_FILE", "./sample/getworkspace"), "Failed to set WS_MAP_FILE")
 
 	t.Run("PassPath", func(t *testing.T) {
-		assert.True(t, runAndValidateScript(t, filePathPass, scriptPath), "Script validation failed for PassPath")
+		assert.True(t, runAndValidateScript(t, filePathSuccess, scriptPath), "Script validation failed for PassPath")
 	})
 
 	t.Run("FailPath", func(t *testing.T) {
