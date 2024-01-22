@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Cache jq
         id: cache-jq
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/packages
           key: jq-1.7-${{ runner.os }}
