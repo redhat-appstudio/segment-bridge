@@ -1,4 +1,4 @@
-FROM registry.k8s.io/kwok/cluster:v0.5.0-k8s.v1.27.3
+FROM registry.k8s.io/kwok/cluster:v0.5.1-k8s.v1.27.3
 
 ENV HOST_CLUSTER=host
 ENV MEMBER_CLUSTER=m01
