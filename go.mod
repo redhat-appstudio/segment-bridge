@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/lithammer/dedent v1.1.0
 	github.com/sergi/go-diff v1.3.1
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	golang.org/x/exp v0.0.0-20230725093048-515e97ebf090
 	gopkg.in/yaml.v3 v3.0.1
 )
