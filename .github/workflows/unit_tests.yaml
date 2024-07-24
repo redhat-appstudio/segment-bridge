@@ -10,7 +10,7 @@ jobs:
   go-test:
     runs-on: ubuntu-latest
     container:
-      image: registry.access.redhat.com/ubi9/go-toolset:1.21.11-2.1720624888
+      image: registry.access.redhat.com/ubi9/go-toolset:1.21.11-7
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
