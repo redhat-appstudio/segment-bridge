@@ -109,8 +109,7 @@ spec:
       name: java
       type: string
     - default: ""
-      description: Image tag expiration time, time values could be something like
-        1h, 2d, 3w for hours, days, and weeks, respectively.
+      description: Image tag expiration time, time values could be something like 1h, 2d, 3w for hours, days, and weeks, respectively.
       name: image-expires-after
     results:
     - description: ""
@@ -306,7 +305,7 @@ spec:
         - "false"
     - name: sast-snyk-check
       runAfter:
-      - clone-repository
+      - build-container
       taskRef:
         params:
         - name: name
@@ -324,6 +323,11 @@ spec:
       workspaces:
       - name: workspace
         workspace: workspace
+      params:
+      - name: image-digest
+        value: $(tasks.build-container.results.IMAGE_DIGEST)
+      - name: image-url
+        value: $(tasks.build-container.results.IMAGE_URL)
     - name: clamav-scan
       params:
       - name: image-digest
