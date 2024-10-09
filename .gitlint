@@ -1,5 +1,6 @@
 [general]
 contrib=contrib-title-conventional-commits,contrib-body-requires-signed-off-by
+regex-style-search=True
 
 [title-max-length]
 line-length=72
@@ -11,5 +12,5 @@ line-length=72
 
 # Bot users tends to generate invalid commits.
 [ignore-by-author-name]
-regex=(dependabot|red-hat-trusted-app-pipeline|red-hat-konflux)
+regex="^(dependabot|red-hat-trusted-app-pipeline|red-hat-konflux)$"
 ignore=all
