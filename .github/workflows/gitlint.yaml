@@ -16,6 +16,10 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
       - name: Install Python dependencies
         run: pip install -r requirements.lock
       - name: Run gitlint on CI with pre-commit
