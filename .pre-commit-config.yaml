@@ -35,4 +35,4 @@ repos:
           - --enable
           - unused
     repo: https://github.com/golangci/golangci-lint
-    rev: v1.62.0
+    rev: v1.62.2
