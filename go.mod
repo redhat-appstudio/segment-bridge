@@ -1,12 +1,14 @@
 module github.com/redhat-appstudio/segment-bridge.git
 
-go 1.20
+go 1.23.0
+
+toolchain go1.23.6
 
 require (
 	github.com/lithammer/dedent v1.1.0
 	github.com/sergi/go-diff v1.3.1
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/exp v0.0.0-20230725093048-515e97ebf090
+	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa
 	gopkg.in/yaml.v3 v3.0.1
 )
 
