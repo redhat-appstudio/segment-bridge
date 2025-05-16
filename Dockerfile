@@ -1,5 +1,5 @@
 # First stage: Build the Go binaries
-FROM registry.access.redhat.com/ubi9/go-toolset:9.5-1739801907 AS builder
+FROM registry.access.redhat.com/ubi9/go-toolset:9.6-1747333074 AS builder
 WORKDIR /opt/app-root/src
 COPY --chown=default:root . .
 RUN go build -o /opt/app-root/build/ ./cmd/...
